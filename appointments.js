@@ -1415,7 +1415,7 @@ function renderCenters(origin) {
 	el.centerList.innerHTML = geo.centers
 		.map(function (c, index) {
 			const rating = c.rating
-				? c.rating.toFixed(1) + " ★ (" + c.ratingCount + ")"
+				? c.rating.toFixed(1) + "  (" + c.ratingCount + ")"
 				: "No rating yet";
 			return (
 				'<li class="center-item' +

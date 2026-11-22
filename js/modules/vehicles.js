@@ -190,7 +190,7 @@ const VehicleModule = (() => {
     if (vehicles.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon">🚗</div>
+          <div class="empty-icon"><i class="fas fa-car"></i></div>
           <h3>No Vehicles Found</h3>
           <p>Register a vehicle or adjust your filters.</p>
         </div>

@@ -169,7 +169,7 @@ const AppointmentModule = (() => {
 
     content.innerHTML = `
       <div class="confirmation-badge-success">
-        <div class="icon-circle">✓</div>
+        <div class="icon-circle"><i class="fas fa-check"></i></div>
         <h3>Booking Confirmed!</h3>
         <p class="text-muted">Your service appointment has been scheduled successfully.</p>
       </div>
@@ -232,7 +232,7 @@ const AppointmentModule = (() => {
     if (appointments.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon">📅</div>
+          <div class="empty-icon"><i class="fas fa-calendar-alt"></i></div>
           <h3>No Appointments Found</h3>
           <p>${filterStatus === 'all' ? 'No appointments have been booked yet.' : `No appointments with status "${filterStatus}".`}</p>
         </div>

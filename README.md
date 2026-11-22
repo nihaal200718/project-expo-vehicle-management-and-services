@@ -4,7 +4,7 @@ A complete, enterprise-grade, integrated **Vehicle Management and Maintenance We
 
 ---
 
-## 🚀 Live Demo & Navigation
+## Live Demo & Navigation
 
 - **Main Dashboard & Integrated Portal**: [`index.html`](file:///home/vydhikreddy/vehicle-service-management/index.html)
 - **Member 1 (Owners)**: Direct tab in `index.html#owners`
@@ -15,9 +15,9 @@ A complete, enterprise-grade, integrated **Vehicle Management and Maintenance We
 
 ---
 
-## 👥 Architecture & Team Deliverables Breakdown
+## Architecture & Team Deliverables Breakdown
 
-### 🔐 Authentication Portal (Email + Google Account)
+### Authentication Portal (Email + Google Account)
 - **Features**:
   - Secure email & password sign-in and account registration with field validation.
   - Interactive **"Sign in with Google"** OAuth flow with account picker dialog and custom profile login.
@@ -27,7 +27,7 @@ A complete, enterprise-grade, integrated **Vehicle Management and Maintenance We
 
 ---
 
-### 👤 Member 1: Owner Registration and Profile Management
+### Member 1: Owner Registration and Profile Management
 - **Role**: Frontend + Core JavaScript
 - **Deliverables**:
   - **Owner Registration Form**: Captures unique Owner ID, Full Name, 10-digit Mobile Number, Email Address, and Residential Address.
@@ -40,7 +40,7 @@ A complete, enterprise-grade, integrated **Vehicle Management and Maintenance We
 
 ---
 
-### 🚗 Member 2: Vehicle Registration and Dashboard
+### Member 2: Vehicle Registration and Dashboard
 - **Role**: Frontend + Core JavaScript
 - **Deliverables**:
   - **Vehicle Registration Form**: Collects Registration Number (e.g., `MH 02 CL 4589`), Manufacturer / Make, Model, Fuel Type (Petrol, Diesel, Electric, Hybrid, CNG), Purchase Date, Insurance Expiry Date, and PUC Expiry Date.
@@ -52,7 +52,7 @@ A complete, enterprise-grade, integrated **Vehicle Management and Maintenance We
 
 ---
 
-### 🔧 Member 3: Service History and Maintenance
+### Member 3: Service History and Maintenance
 - **Role**: Core JavaScript & Financial Calculations
 - **Deliverables**:
   - **Service History Logging**:
@@ -68,7 +68,7 @@ A complete, enterprise-grade, integrated **Vehicle Management and Maintenance We
 
 ---
 
-### 📅 Member 4: Appointment Booking System
+### Member 4: Appointment Booking System
 - **Role**: JavaScript + Form Scheduling
 - **Deliverables**:
   - **Appointment Booking Interface**:
@@ -83,7 +83,7 @@ A complete, enterprise-grade, integrated **Vehicle Management and Maintenance We
 
 ---
 
-### 📊 Member 5: Dashboard, Reports & Integration Lead
+### Member 5: Dashboard, Reports & Integration Lead
 - **Role**: Integration Lead & Analytics
 - **Deliverables**:
   - **Executive KPI Dashboard**: Real-time summary tiles showing Total Owners, Total Vehicles, Cumulative Maintenance Expenditure, Active Appointments, and Expiring Document Alerts.
@@ -100,7 +100,7 @@ A complete, enterprise-grade, integrated **Vehicle Management and Maintenance We
 
 ---
 
-## 🛠️ Data Storage Schema (LocalStorage)
+## Data Storage Schema (LocalStorage)
 
 The application unifies all modules using the following LocalStorage keys:
 - `owners`: Array of owner entities (`id`, `name`, `mobile`, `email`, `address`, `createdDate`).
@@ -111,7 +111,7 @@ The application unifies all modules using the following LocalStorage keys:
 
 ---
 
-## 💻 How to Run Locally
+## How to Run Locally
 
 1. **Clone the repository**:
    ```bash

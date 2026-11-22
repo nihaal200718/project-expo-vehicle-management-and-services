@@ -314,7 +314,7 @@ const ServiceModule = (() => {
         <tr>
           <td colspan="7" class="text-center py-6 text-muted">
             <div class="empty-state">
-              <div class="empty-icon">🔧</div>
+              <div class="empty-icon"><i class="fas fa-wrench"></i></div>
               <p>No service records match your criteria.</p>
             </div>
           </td>

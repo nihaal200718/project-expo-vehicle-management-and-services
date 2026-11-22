@@ -154,7 +154,7 @@ const OwnerModule = (() => {
     if (owners.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon">👤</div>
+          <div class="empty-icon"><i class="fas fa-user"></i></div>
           <h3>No Owners Found</h3>
           <p>${filterTerm ? 'No owner matches your search filter.' : 'Register your first vehicle owner using the form.'}</p>
         </div>
