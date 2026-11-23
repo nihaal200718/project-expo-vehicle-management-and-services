@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Service history | Vehicle Service and Maintenance Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/services.css">
+</head>
+<body>
+  <header class="topbar">
+    <span class="brand">Vehicle Service and Maintenance</span>
+    <nav aria-label="Service module">
+      <a href="index.html" style="font-weight: 700; color: #2563eb;">← Master Dashboard</a>
+      <a href="services.html" class="active" aria-current="page">Service history</a>
+      <a href="maintenance.html">Spare parts</a>
+      <a href="appointments.html">Appointments</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="page-head">
+      <div>
+        <h1>Service history</h1>
+        <p class="muted">Record each workshop visit with the parts replaced and the charges.</p>
+      </div>
+      <button type="button" class="btn btn-secondary" id="seedBtn">Load sample data</button>
+    </div>
+
+    <p id="noVehicles" class="notice" hidden>
+      No registered vehicles found in the <code>vehicles</code> key. Register a vehicle first, or load sample data to test this page.
+    </p>
+
+    <div class="layout">
+      <section class="card" aria-labelledby="formTitle">
+        <h2 id="formTitle">Add service record</h2>
+
+        <form id="serviceForm" novalidate>
+          <div class="form-grid">
+            <div class="field">
+              <label for="vehicleId">Vehicle</label>
+              <select id="vehicleId" required></select>
+            </div>
+            <div class="field">
+              <label for="serviceDate">Service date</label>
+              <input type="date" id="serviceDate" required>
+            </div>
+            <div class="field">
+              <label for="serviceCenter">Service center</label>
+              <input type="text" id="serviceCenter" placeholder="ABC Motors" required>
+            </div>
+            <div class="field">
+              <label for="serviceType">Service type</label>
+              <select id="serviceType" required></select>
+            </div>
+            <div class="field">
+              <label for="mileage">Mileage at service (km)</label>
+              <input type="number" id="mileage" min="0" step="1" placeholder="15000" required>
+            </div>
+            <div class="field">
+              <label for="nextServiceDate">Next service due <span class="hint">(optional, defaults to 6 months)</span></label>
+              <input type="date" id="nextServiceDate">
+            </div>
+            <div class="field full">
+              <label for="description">Description</label>
+              <textarea id="description" rows="2" placeholder="Engine oil and filter replacement"></textarea>
+            </div>
+          </div>
+
+          <h3>Spare parts replaced</h3>
+          <div class="table-wrap">
+            <table class="parts-table">
+              <thead>
+                <tr>
+                  <th scope="col">Part name</th>
+                  <th scope="col">Qty</th>
+                  <th scope="col">Unit cost (₹)</th>
+                  <th scope="col" class="num">Line total</th>
+                  <th scope="col"><span class="sr-only">Remove</span></th>
+                </tr>
+              </thead>
+              <tbody id="partsBody"></tbody>
+            </table>
+          </div>
+          <datalist id="partSuggestions">
+            <option value="Engine Oil"></option>
+            <option value="Oil Filter"></option>
+            <option value="Air Filter"></option>
+            <option value="Brake Pads"></option>
+            <option value="Spark Plug"></option>
+            <option value="Coolant"></option>
+            <option value="Battery"></option>
+            <option value="Clutch Plate"></option>
+          </datalist>
+          <button type="button" class="btn btn-secondary" id="addPartBtn">Add part</button>
+
+          <div class="field narrow">
+            <label for="labourCost">Labour charges (₹)</label>
+            <input type="number" id="labourCost" min="0" step="0.01" placeholder="1000">
+          </div>
+
+          <p id="formError" class="form-error" role="alert" hidden></p>
+
+          <div class="actions">
+            <button type="submit" class="btn btn-primary" id="saveBtn">Save service record</button>
+            <button type="button" class="btn btn-secondary" id="cancelEditBtn" hidden>Cancel edit</button>
+          </div>
+        </form>
+      </section>
+
+      <aside class="card receipt" aria-label="Cost summary">
+        <h2>Cost summary</h2>
+        <ul id="receiptParts" class="receipt-lines"></ul>
+        <dl class="receipt-totals">
+          <div><dt>Spare parts</dt><dd id="sumParts">₹0</dd></div>
+          <div><dt>Labour</dt><dd id="sumLabour">₹0</dd></div>
+          <div class="grand"><dt>Total service cost</dt><dd id="sumTotal">₹0</dd></div>
+        </dl>
+      </aside>
+    </div>
+
+    <section class="card" aria-labelledby="historyTitle">
+      <h2 id="historyTitle">Service records</h2>
+
+      <div class="filters">
+        <div class="field">
+          <label for="filterVehicle">Vehicle</label>
+          <select id="filterVehicle"></select>
+        </div>
+        <div class="field">
+          <label for="filterFrom">From date</label>
+          <input type="date" id="filterFrom">
+        </div>
+        <div class="field">
+          <label for="filterTo">To date</label>
+          <input type="date" id="filterTo">
+        </div>
+        <button type="button" class="btn btn-secondary" id="clearFilters">Clear filters</button>
+      </div>
+
+      <dl class="stats" aria-label="Totals for the records shown">
+        <div><dt>Records shown</dt><dd id="statCount">0</dd></div>
+        <div><dt>Spare parts cost</dt><dd id="statParts">₹0</dd></div>
+        <div><dt>Labour charges</dt><dd id="statLabour">₹0</dd></div>
+        <div><dt>Total service cost</dt><dd id="statTotal">₹0</dd></div>
+      </dl>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th scope="col">Service ID</th>
+              <th scope="col">Date</th>
+              <th scope="col">Vehicle</th>
+              <th scope="col">Service center</th>
+              <th scope="col">Type</th>
+              <th scope="col" class="num">Mileage</th>
+              <th scope="col" class="num">Parts</th>
+              <th scope="col" class="num">Labour</th>
+              <th scope="col" class="num">Total cost</th>
+              <th scope="col"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+      <p id="emptyHistory" class="empty" hidden>No service records match these filters. Add a record above or clear the filters.</p>
+    </section>
+
+    <section class="card" aria-labelledby="vehicleTotalsTitle">
+      <h2 id="vehicleTotalsTitle">Maintenance expenses by vehicle</h2>
+      <p class="muted">All service records, regardless of the filters above.</p>
+      <div class="table-wrap">
+        <table class="data-table compact">
+          <thead>
+            <tr>
+              <th scope="col">Vehicle</th>
+              <th scope="col" class="num">Services</th>
+              <th scope="col" class="num">Spare parts</th>
+              <th scope="col" class="num">Labour</th>
+              <th scope="col" class="num">Total cost</th>
+            </tr>
+          </thead>
+          <tbody id="vehicleTotalsBody"></tbody>
+          <tfoot id="vehicleTotalsFoot"></tfoot>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="js/services.js"></script>
+  <link rel="stylesheet" href="services.css"><script src="services.js"></script>
+</body>
+</html>

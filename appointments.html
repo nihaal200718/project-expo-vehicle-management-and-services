@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>
+			Service Appointments | Vehicle Service & Maintenance Management
+		</title>
+		<link rel="stylesheet" href="appointments.css" />
+	</head>
+	<body>
+		<div class="app">
+			<!-- ===== Top bar with two tabs ===== -->
+			<nav class="topbar">
+				<a href="index.html" class="brand" style="text-decoration: none; color: inherit;">← Master Dashboard</a>
+				<span class="brand">Vehicle Service &amp; Maintenance</span>
+				<div class="tabs" role="tablist">
+					<button
+						type="button"
+						class="tab active"
+						id="tabBook"
+						role="tab"
+						aria-selected="true">
+						Book Appointment
+					</button>
+					<button
+						type="button"
+						class="tab"
+						id="tabList"
+						role="tab"
+						aria-selected="false">
+						My Appointments <span class="count-pill" id="countPill">0</span>
+					</button>
+				</div>
+			</nav>
+
+			<!-- =====================================================
+         VIEW 1: Scheduler (details | calendar | time slots)
+         ===================================================== -->
+			<section id="viewBook" class="view">
+				<form id="bookingForm" class="scheduler" novalidate>
+					<!-- ---------- LEFT: appointment details ---------- -->
+					<aside class="panel panel-left">
+						<button type="button" class="back-btn" id="backBtn">
+							<svg
+								width="14"
+								height="14"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2.5"
+								stroke-linecap="round"
+								stroke-linejoin="round">
+								<path d="M15 18l-6-6 6-6" />
+							</svg>
+							Back
+						</button>
+
+						<div class="logo" aria-hidden="true">
+							<svg
+								width="46"
+								height="46"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="#fff"
+								stroke-width="1.7"
+								stroke-linecap="round"
+								stroke-linejoin="round">
+								<path
+									d="M5 16l1.4-4.6A2 2 0 0 1 8.3 10h7.4a2 2 0 0 1 1.9 1.4L19 16" />
+								<path
+									d="M4 16h16v3a1 1 0 0 1-1 1h-1.5a1 1 0 0 1-1-1v-1h-9v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z" />
+								<circle cx="7.5" cy="13.5" r="0.6" fill="#fff" />
+								<circle cx="16.5" cy="13.5" r="0.6" fill="#fff" />
+								<path d="M12 3.5v3M9.8 4.4l1.2 1.5M14.2 4.4L13 5.9" />
+							</svg>
+						</div>
+
+						<h1 id="panelTitle">Service &amp; Maintenance Appointment</h1>
+
+						<div id="rescheduleBanner" class="reschedule-banner" hidden>
+							<span id="rescheduleText"></span>
+							<button type="button" class="link-btn" id="cancelReschedule">
+								Cancel reschedule
+							</button>
+						</div>
+
+						<p class="desc clamp" id="descText">
+							Schedule oil changes, tire rotations, brake checks, or a full
+							service, online and hassle-free. Choose your vehicle and service,
+							pick a date, and select an open time slot. Slots marked red are
+							already taken by another booking, and we take care of the rest.
+						</p>
+						<button type="button" class="link-btn" id="toggleDesc">
+							+ Show more
+						</button>
+
+						<div class="chips">
+							<span class="chip">
+								<svg
+									width="15"
+									height="15"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round">
+									<circle cx="12" cy="12" r="9" />
+									<path d="M12 7v5l3 2" />
+								</svg>
+								1 hour slots
+							</span>
+							<span class="chip">
+								<svg
+									width="15"
+									height="15"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round">
+									<path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z" />
+									<circle cx="12" cy="10" r="2.5" />
+								</svg>
+								Automotive Industry
+							</span>
+						</div>
+
+						<div id="noVehicleNotice" class="notice" hidden>
+							No registered vehicles found. Register a vehicle first (Vehicle
+							module), then return here.
+						</div>
+
+						<div class="form-group">
+							<label for="vehicleSelect"
+								>Vehicle <span class="required">*</span></label
+							>
+							<select id="vehicleSelect" name="vehicleId">
+								<option value="">Select a registered vehicle</option>
+							</select>
+							<p class="error" id="vehicleError"></p>
+						</div>
+
+						<div id="vehicleInfo" class="vehicle-info" hidden>
+							<div>
+								<span class="info-label">Reg. No.</span
+								><strong id="infoRegNo">-</strong>
+							</div>
+							<div>
+								<span class="info-label">Model</span
+								><strong id="infoModel">-</strong>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="serviceType"
+								>Service Type <span class="required">*</span></label
+							>
+							<select id="serviceType" name="serviceType">
+								<option value="">Select a service</option>
+							</select>
+							<p class="error" id="serviceError"></p>
+						</div>
+
+						<div class="form-group">
+							<label for="description">Additional Requirements</label>
+							<textarea
+								id="description"
+								name="description"
+								rows="3"
+								maxlength="300"
+								placeholder="e.g. Engine oil replacement, check brake noise"></textarea>
+						</div>
+					</aside>
+
+					<!-- ---------- MIDDLE: calendar ---------- -->
+					<section class="panel panel-mid">
+						<div class="mid-head">
+							<h2>Select a Date &amp; Time</h2>
+							<span class="tz-chip" id="tzChip">GMT</span>
+						</div>
+
+						<div class="cal-nav">
+							<button
+								type="button"
+								class="icon-btn"
+								id="prevMonth"
+								aria-label="Previous month">
+								<svg
+									width="16"
+									height="16"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2.5"
+									stroke-linecap="round"
+									stroke-linejoin="round">
+									<path d="M15 18l-6-6 6-6" />
+								</svg>
+							</button>
+							<strong id="monthLabel">Month</strong>
+							<button
+								type="button"
+								class="icon-btn"
+								id="nextMonth"
+								aria-label="Next month">
+								<svg
+									width="16"
+									height="16"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2.5"
+									stroke-linecap="round"
+									stroke-linejoin="round">
+									<path d="M9 18l6-6-6-6" />
+								</svg>
+							</button>
+						</div>
+
+						<div class="weekdays">
+							<span>Su</span><span>Mo</span><span>Tu</span><span>We</span
+							><span>Th</span><span>Fr</span><span>Sa</span>
+						</div>
+						<div class="cal-grid" id="calendarGrid"></div>
+
+						<ul class="legend">
+							<li><i class="swatch swatch-open"></i> Available</li>
+							<li><i class="swatch swatch-full"></i> Fully booked</li>
+							<li><i class="swatch swatch-sel"></i> Selected</li>
+						</ul>
+					</section>
+
+					<!-- ---------- RIGHT: time slots ---------- -->
+					<aside class="panel panel-right">
+						<div class="right-head">
+							<h3 id="slotDateTitle">Pick a date</h3>
+							<div class="seg" role="group" aria-label="Time format">
+								<button type="button" class="seg-btn active" id="fmt12">
+									12h
+								</button>
+								<button type="button" class="seg-btn" id="fmt24">24h</button>
+							</div>
+						</div>
+
+						<div class="slot-list" id="slotList"></div>
+
+						<div class="book-area">
+							<p class="selection-summary" id="selectionSummary"></p>
+							<p class="error" id="schedError"></p>
+							<p class="error" id="formError"></p>
+							<button
+								type="submit"
+								class="btn btn-primary btn-block"
+								id="bookBtn">
+								Book Appointment
+							</button>
+						</div>
+					</aside>
+				</form>
+
+				<!-- ===== Nearest service centers (Google Maps) ===== -->
+				<section
+					class="centers"
+					id="centersPanel"
+					aria-labelledby="centersTitle">
+					<div class="centers-head">
+						<div>
+							<h2 id="centersTitle">Nearest Service Centers</h2>
+							<p class="centers-status" id="centersStatus">Loading...</p>
+						</div>
+						<div class="centers-actions">
+							<button type="button" class="btn btn-outline" id="locateBtn">
+								Use my location
+							</button>
+							<button type="button" class="btn btn-outline" id="searchAreaBtn">
+								Search this area
+							</button>
+						</div>
+					</div>
+					<div class="centers-body">
+						<div class="map-box">
+							<div id="mapCanvas"></div>
+							<div id="mapPlaceholder" class="map-placeholder">
+								<strong>Google Maps is not set up yet</strong>
+								<p>
+									Open <code>js/appointments.js</code> and replace
+									<code>YOUR_GOOGLE_MAPS_API_KEY</code> with your key. Enable
+									<em>Maps JavaScript API</em> and <em>Places API (New)</em> in
+									Google Cloud.
+								</p>
+							</div>
+						</div>
+						<ol class="center-list" id="centerList"></ol>
+					</div>
+				</section>
+			</section>
+
+			<!-- =====================================================
+         VIEW 2: All appointments
+         ===================================================== -->
+			<section id="viewList" class="view" hidden>
+				<div class="list-panel">
+					<div class="list-head">
+						<h2>All Appointments</h2>
+						<div class="filters">
+							<div class="form-group">
+								<label for="filterDate">Date</label>
+								<input type="date" id="filterDate" />
+							</div>
+							<div class="form-group">
+								<label for="filterStatus">Status</label>
+								<select id="filterStatus">
+									<option value="">All statuses</option>
+									<option value="Confirmed">Confirmed</option>
+									<option value="Pending">Pending</option>
+									<option value="Cancelled">Cancelled</option>
+									<option value="Completed">Completed</option>
+								</select>
+							</div>
+							<button type="button" class="btn btn-outline" id="clearFilters">
+								Clear
+							</button>
+						</div>
+					</div>
+
+					<div class="table-wrap">
+						<table class="table">
+							<thead>
+								<tr>
+									<th>ID</th>
+									<th>Vehicle</th>
+									<th>Service</th>
+									<th>Date</th>
+									<th>Time</th>
+									<th>Status</th>
+									<th>Actions</th>
+								</tr>
+							</thead>
+							<tbody id="appointmentBody"></tbody>
+						</table>
+					</div>
+				</div>
+			</section>
+
+			<!-- ===== Demo tools (remove before final integration) ===== -->
+			<details class="demo-tools">
+				<summary>Demo / testing tools (for college demonstration only)</summary>
+				<div class="demo-buttons">
+					<button type="button" class="btn btn-outline" id="seedVehicles">
+						Load sample vehicles
+					</button>
+					<button type="button" class="btn btn-outline" id="seedAppointments">
+						Load sample appointments
+					</button>
+					<button
+						type="button"
+						class="btn btn-danger-outline"
+						id="clearAppointments">
+						Clear all appointments
+					</button>
+				</div>
+				<p class="hint">
+					Sample vehicles are only added if the <code>vehicles</code> key is
+					empty, so Member 2's real data is never overwritten.
+				</p>
+			</details>
+		</div>
+
+		<!-- ===== Dialog: booking confirmation ===== -->
+		<dialog id="confirmDialog" class="dialog">
+			<div class="dialog-head success-head"><h3>Booking Confirmed</h3></div>
+			<div class="dialog-body" id="confirmBody"></div>
+			<div class="dialog-foot">
+				<button type="button" class="btn btn-primary" data-close>Done</button>
+			</div>
+		</dialog>
+
+		<!-- ===== Dialog: appointment details ===== -->
+		<dialog id="detailsDialog" class="dialog">
+			<div class="dialog-head"><h3>Appointment Details</h3></div>
+			<div class="dialog-body" id="detailsBody"></div>
+			<div class="dialog-foot" id="detailsActions"></div>
+		</dialog>
+
+		<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+		<script src="appointments.js"></script>
+	</body>
+</html>

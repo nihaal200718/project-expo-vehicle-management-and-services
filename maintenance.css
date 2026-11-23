@@ -1,0 +1,33 @@
+/* Shared tokens, layout, forms, tables and buttons live in services.css */
+@import url("services.css");
+
+.part-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem 1.25rem;
+}
+
+.line-total {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--primary);
+}
+
+.stats.three { grid-template-columns: repeat(3, 1fr); }
+
+.notice a { color: var(--accent); font-weight: 600; }
+select:disabled { background: var(--head-bg); color: var(--text-secondary); cursor: not-allowed; }
+
+@media (max-width: 800px) {
+  .part-form-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+  .part-form-grid { grid-template-columns: 1fr; }
+  .stats.three { grid-template-columns: 1fr; }
+  .stats.three > div { border-left: 0; border-top: 1px solid var(--border); }
+  .stats.three > div:first-child { border-top: 0; }
+}

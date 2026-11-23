@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spare parts | Vehicle Service and Maintenance Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/maintenance.css">
+</head>
+<body>
+  <header class="topbar">
+    <span class="brand">Vehicle Service and Maintenance</span>
+    <nav aria-label="Service module">
+      <a href="index.html" style="font-weight: 700; color: #2563eb;">← Master Dashboard</a>
+      <a href="services.html">Service history</a>
+      <a href="maintenance.html" class="active" aria-current="page">Spare parts</a>
+      <a href="appointments.html">Appointments</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="page-head">
+      <div>
+        <h1>Spare parts</h1>
+        <p class="muted">Every replaced part, linked to its service and vehicle. Changes here update the service totals.</p>
+      </div>
+      <button type="button" class="btn btn-secondary" id="recalcBtn">Recalculate all totals</button>
+    </div>
+
+    <p id="mismatchNotice" class="notice" hidden></p>
+    <p id="noServices" class="notice" hidden>
+      No service records found in the <code>services</code> key. Add a service on the <a href="services.html">Service history</a> page first; parts always belong to a service.
+    </p>
+
+    <section class="card" aria-labelledby="formTitle">
+      <h2 id="formTitle">Add spare part to a service</h2>
+      <form id="partForm" novalidate>
+        <div class="part-form-grid">
+          <div class="field">
+            <label for="mVehicle">Vehicle</label>
+            <select id="mVehicle" required></select>
+          </div>
+          <div class="field">
+            <label for="mService">Service</label>
+            <select id="mService" required></select>
+          </div>
+          <div class="field">
+            <label for="mPartName">Part name</label>
+            <input type="text" id="mPartName" list="partSuggestions" placeholder="Brake Pads" required>
+          </div>
+          <div class="field">
+            <label for="mQuantity">Quantity</label>
+            <input type="number" id="mQuantity" min="1" step="1" value="1" required>
+          </div>
+          <div class="field">
+            <label for="mUnitCost">Unit cost (₹)</label>
+            <input type="number" id="mUnitCost" min="0" step="0.01" required>
+          </div>
+          <div class="field">
+            <label>Line total</label>
+            <output id="mLineTotal" class="line-total">₹0</output>
+          </div>
+        </div>
+        <datalist id="partSuggestions">
+          <option value="Engine Oil"></option>
+          <option value="Oil Filter"></option>
+          <option value="Air Filter"></option>
+          <option value="Brake Pads"></option>
+          <option value="Spark Plug"></option>
+          <option value="Coolant"></option>
+          <option value="Battery"></option>
+          <option value="Clutch Plate"></option>
+        </datalist>
+
+        <p id="formError" class="form-error" role="alert" hidden></p>
+        <div class="actions">
+          <button type="submit" class="btn btn-primary" id="saveBtn">Add spare part</button>
+          <button type="button" class="btn btn-secondary" id="cancelEditBtn" hidden>Cancel edit</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card" aria-labelledby="ledgerTitle">
+      <h2 id="ledgerTitle">Spare parts records</h2>
+
+      <div class="filters">
+        <div class="field">
+          <label for="filterVehicle">Vehicle</label>
+          <select id="filterVehicle"></select>
+        </div>
+        <div class="field">
+          <label for="filterService">Service</label>
+          <select id="filterService"></select>
+        </div>
+        <div class="field">
+          <label for="filterText">Part name</label>
+          <input type="search" id="filterText" placeholder="Search parts">
+        </div>
+        <button type="button" class="btn btn-secondary" id="clearFilters">Clear filters</button>
+      </div>
+
+      <dl class="stats three" aria-label="Totals for the records shown">
+        <div><dt>Part records shown</dt><dd id="statCount">0</dd></div>
+        <div><dt>Units replaced</dt><dd id="statUnits">0</dd></div>
+        <div><dt>Spare parts cost</dt><dd id="statParts">₹0</dd></div>
+      </dl>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th scope="col">Part ID</th>
+              <th scope="col">Service</th>
+              <th scope="col">Vehicle</th>
+              <th scope="col">Part name</th>
+              <th scope="col" class="num">Qty</th>
+              <th scope="col" class="num">Unit cost</th>
+              <th scope="col" class="num">Total cost</th>
+              <th scope="col"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody id="ledgerBody"></tbody>
+        </table>
+      </div>
+      <p id="emptyLedger" class="empty" hidden>No spare parts match these filters.</p>
+    </section>
+
+    <section class="card" aria-labelledby="vehicleTotalsTitle">
+      <h2 id="vehicleTotalsTitle">Expenses by vehicle</h2>
+      <p class="muted">Spare parts come from the parts records; labour and total cost come from the service records.</p>
+      <div class="table-wrap">
+        <table class="data-table compact">
+          <thead>
+            <tr>
+              <th scope="col">Vehicle</th>
+              <th scope="col" class="num">Part records</th>
+              <th scope="col" class="num">Spare parts</th>
+              <th scope="col" class="num">Labour</th>
+              <th scope="col" class="num">Total cost</th>
+            </tr>
+          </thead>
+          <tbody id="vehicleTotalsBody"></tbody>
+          <tfoot id="vehicleTotalsFoot"></tfoot>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="js/maintenance.js"></script>
+  <link rel="stylesheet" href="maintenance.css">
+  <script src="maintenance.js"></script>
+</body>
+
+</html>
