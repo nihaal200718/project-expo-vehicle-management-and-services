@@ -1,0 +1,166 @@
+
+:root {
+    --primary: #172B4D;
+    --accent: #2563EB;
+    --teal: #0F9D8A;
+
+    --background: #F4F7FB;
+    --surface: #FFFFFF;
+
+    --text-primary: #172B4D;
+    --text-secondary: #64748B;
+
+    --border: #E2E8F0;
+
+    --success: #16A34A;
+    --warning: #F59E0B;
+    --danger: #DC2626;
+    --neutral: #64748B;
+
+    --card-radius: 12px;
+    --button-radius: 8px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: var(--background);
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+header {
+    background: var(--primary);
+    color: white;
+    text-align: center;
+    padding: 25px;
+}
+
+header h1 {
+    margin-bottom: 8px;
+}
+
+.container {
+    background: var(--surface);
+    max-width: 1100px;
+    margin: 25px auto;
+    padding: 25px;
+    border-radius: var(--card-radius);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+}
+
+h2 {
+    margin-bottom: 20px;
+    color: var(--primary);
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+label {
+    display: block;
+    margin-bottom: 7px;
+    font-weight: bold;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--button-radius);
+    font-size: 15px;
+    font-family: inherit;
+}
+
+input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 11px 18px;
+    border-radius: var(--button-radius);
+    cursor: pointer;
+    margin: 5px 5px 5px 0;
+    font-size: 14px;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+.secondary-btn {
+    background: var(--neutral);
+}
+
+.edit-btn {
+    background: var(--warning);
+}
+
+.delete-btn {
+    background: var(--danger);
+}
+
+.view-btn {
+    background: var(--teal);
+}
+
+#searchInput {
+    margin-bottom: 20px;
+}
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 750px;
+}
+
+th, td {
+    padding: 13px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+th {
+    background: var(--primary);
+    color: white;
+}
+
+tr:hover {
+    background: var(--background);
+}
+
+#profileDetails p {
+    margin: 12px 0;
+}
+
+@media (max-width: 600px) {
+    .container {
+        margin: 15px;
+        padding: 18px;
+    }
+
+    header h1 {
+        font-size: 21px;
+    }
+}
+
