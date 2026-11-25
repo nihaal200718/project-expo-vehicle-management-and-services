@@ -1,0 +1,390 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Vehicle Management System</title>
+
+    <link rel="stylesheet" href="../css/vechile.css">
+</head>
+
+<body>
+
+    <!-- HEADER -->
+
+    <header class="header">
+
+        <div>
+            <h2>Vehicle Management</h2>
+            <p>Vehicle Service & Maintenance Management System</p>
+            <p><a href="../index.html">← Master Dashboard</a></p>
+        </div>
+
+        <span class="header-tag">MEMBER 2</span>
+
+    </header>
+
+
+    <main class="container">
+
+        <!-- DASHBOARD -->
+
+        <section class="dashboard">
+
+            <div class="stat-card">
+                <p>Total Vehicles</p>
+                <h2 id="totalVehicles">0</h2>
+                <span>Registered vehicles</span>
+            </div>
+
+            <div class="stat-card">
+                <p>Cars</p>
+                <h2 id="totalCars">0</h2>
+                <span>Registered cars</span>
+            </div>
+
+            <div class="stat-card">
+                <p>Two Wheelers</p>
+                <h2 id="totalTwoWheelers">0</h2>
+                <span>Bikes and scooters</span>
+            </div>
+
+            <div class="stat-card">
+                <p>Other Vehicles</p>
+                <h2 id="totalOthers">0</h2>
+                <span>Other categories</span>
+            </div>
+
+        </section>
+
+
+        <!-- REGISTRATION FORM -->
+
+        <section class="panel">
+
+            <div class="section-heading">
+
+                <div>
+                    <h2 id="formTitle">Register New Vehicle</h2>
+                    <p>Enter vehicle and owner information.</p>
+                </div>
+
+                <span class="form-icon">🚘</span>
+
+            </div>
+
+
+            <form id="vehicleForm">
+
+                <input type="hidden" id="editingVehicleId">
+
+
+                <div class="form-grid">
+
+
+                    <!-- OWNER ID -->
+
+                    <div class="form-group">
+
+                        <label for="ownerId">Owner ID *</label>
+
+                        <select id="ownerId" required>
+
+                            <option value="">Loading Owners...</option>
+
+                        </select>
+
+                        <small id="ownerStatus"></small>
+
+                    </div>
+
+
+                    <!-- REGISTRATION NUMBER -->
+
+                    <div class="form-group">
+
+                        <label for="registrationNumber">
+                            Registration Number *
+                        </label>
+
+                        <input
+                            type="text"
+                            id="registrationNumber"
+                            placeholder="TS09AB1234"
+                            maxlength="15"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- VEHICLE TYPE -->
+
+                    <div class="form-group">
+
+                        <label for="vehicleType">Vehicle Type *</label>
+
+                        <select id="vehicleType" required>
+
+                            <option value="">Select Type</option>
+                            <option value="Car">Car</option>
+                            <option value="Bike">Bike</option>
+                            <option value="Scooter">Scooter</option>
+                            <option value="Truck">Truck</option>
+                            <option value="Bus">Bus</option>
+                            <option value="Other">Other</option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- MANUFACTURER -->
+
+                    <div class="form-group">
+
+                        <label for="manufacturer">Manufacturer *</label>
+
+                        <input
+                            type="text"
+                            id="manufacturer"
+                            placeholder="Hyundai"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- MODEL -->
+
+                    <div class="form-group">
+
+                        <label for="model">Model *</label>
+
+                        <input
+                            type="text"
+                            id="model"
+                            placeholder="i20"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- FUEL TYPE -->
+
+                    <div class="form-group">
+
+                        <label for="fuelType">Fuel Type *</label>
+
+                        <select id="fuelType" required>
+
+                            <option value="">Select Fuel</option>
+                            <option value="Petrol">Petrol</option>
+                            <option value="Diesel">Diesel</option>
+                            <option value="Electric">Electric</option>
+                            <option value="CNG">CNG</option>
+                            <option value="Hybrid">Hybrid</option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- PURCHASE DATE -->
+
+                    <div class="form-group">
+
+                        <label for="purchaseDate">Purchase Date *</label>
+
+                        <input type="date" id="purchaseDate" required>
+
+                    </div>
+
+
+                    <!-- INSURANCE -->
+
+                    <div class="form-group">
+
+                        <label for="insuranceExpiry">Insurance Expiry *</label>
+
+                        <input type="date" id="insuranceExpiry" required>
+
+                    </div>
+
+
+                    <!-- PUC -->
+
+                    <div class="form-group">
+
+                        <label for="pucExpiry">PUC Expiry *</label>
+
+                        <input type="date" id="pucExpiry" required>
+
+                    </div>
+
+
+                    <!-- LAST SERVICE -->
+
+                    <div class="form-group">
+
+                        <label for="lastServiceDate">Last Service Date *</label>
+
+                        <input type="date" id="lastServiceDate" required>
+
+                    </div>
+
+
+                    <!-- NEXT SERVICE -->
+
+                    <div class="form-group">
+
+                        <label for="nextServiceDate">Next Service Date *</label>
+
+                        <input type="date" id="nextServiceDate" required>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- BUTTONS -->
+
+                <div class="form-buttons">
+
+                    <button type="submit" id="saveButton" class="primary-btn">
+                        + Register Vehicle
+                    </button>
+
+                    <button
+                        type="button"
+                        id="cancelButton"
+                        class="cancel-btn"
+                        hidden
+                    >
+                        Cancel Edit
+                    </button>
+
+                    <button type="reset" class="reset-btn">
+                        Reset
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+
+        <!-- REGISTERED VEHICLES -->
+
+        <section class="panel">
+
+            <div class="section-heading">
+
+                <div>
+                    <h2>Registered Vehicles</h2>
+                    <p>View, search and manage vehicles.</p>
+                </div>
+
+            </div>
+
+
+            <!-- SEARCH -->
+
+            <div class="filters">
+
+                <input
+                    type="search"
+                    id="searchInput"
+                    placeholder="Search vehicle, registration or owner..."
+                >
+
+                <select id="typeFilter">
+
+                    <option value="">All Vehicle Types</option>
+                    <option value="Car">Car</option>
+                    <option value="Bike">Bike</option>
+                    <option value="Scooter">Scooter</option>
+                    <option value="Truck">Truck</option>
+                    <option value="Bus">Bus</option>
+                    <option value="Other">Other</option>
+
+                </select>
+
+
+                <select id="fuelFilter">
+
+                    <option value="">All Fuel Types</option>
+                    <option value="Petrol">Petrol</option>
+                    <option value="Diesel">Diesel</option>
+                    <option value="Electric">Electric</option>
+                    <option value="CNG">CNG</option>
+                    <option value="Hybrid">Hybrid</option>
+
+                </select>
+
+            </div>
+
+
+            <!-- TABLE -->
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Vehicle ID</th>
+                            <th>Owner</th>
+                            <th>Registration</th>
+                            <th>Vehicle</th>
+                            <th>Fuel</th>
+                            <th>Insurance Expiry</th>
+                            <th>PUC Expiry</th>
+                            <th>Actions</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="vehicleTableBody"></tbody>
+
+                </table>
+
+            </div>
+
+
+            <p id="emptyMessage" class="empty-message">
+                No vehicles registered yet.
+            </p>
+
+
+            <p id="ownerWarning" class="warning-message" hidden>
+                No registered owners found. Please register an owner first.
+            </p>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+
+        Vehicle Service and Maintenance Management System
+
+    </footer>
+
+
+    <script src="../java%20script/vechile.js"></script>
+
+</body>
+
+</html>
