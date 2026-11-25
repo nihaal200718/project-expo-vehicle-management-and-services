@@ -1,102 +1,1513 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Owner Management System</title>
-
-    <!-- Connecting CSS -->
-    <link rel="stylesheet" href="style.css">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoCare - Vehicle Management & Service System</title>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
-    <header>
-        <h1>Vehicle Service Management System</h1>
-        <p>Owner Registration and Profile Management</p>
-    </header>
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
 
-    <main>
-        <section class="container">
+  <!-- Mobile Sidebar Backdrop -->
+  <div id="mobile-sidebar-backdrop" class="modal-overlay hidden" style="background: rgba(0,0,0,0.5); z-index: 35;"></div>
 
-            <h2>Owner Registration</h2>
+  <div class="app-container">
+    <!-- LEFT SIDEBAR NAVIGATION -->
+    <aside id="app-sidebar" class="app-sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon-box">
+          <i class="fas fa-car-alt"></i>
+        </div>
+        <div>
+          <div class="brand-title">AutoCare VMS</div>
+          <div class="brand-sub">Enterprise Portal</div>
+        </div>
+      </div>
 
-            <form id="ownerForm">
+      <!-- CUSTOMER / USER SIDE NAVIGATION -->
+      <nav id="sidebar-nav-customer" class="sidebar-nav">
+        <span class="nav-section-label">Customer Portal</span>
+        <a class="nav-link customer-nav-link active" data-cust-view="dashboard">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>My Dashboard</span>
+        </a>
+        <a class="nav-link customer-nav-link" data-cust-view="garage">
+          <i class="fas fa-warehouse"></i>
+          <span>My Garage</span>
+          <span class="badge badge-primary text-xs" id="cust-kpi-vehicles-sidebar">Cars</span>
+        </a>
+        <a class="nav-link customer-nav-link" data-cust-view="book">
+          <i class="fas fa-calendar-plus"></i>
+          <span>Book a Service</span>
+        </a>
+        <a class="nav-link customer-nav-link" data-cust-view="bookings">
+          <i class="fas fa-clock"></i>
+          <span>Live Service Tracker</span>
+        </a>
+        <a class="nav-link customer-nav-link" data-cust-view="invoices">
+          <i class="fas fa-file-invoice"></i>
+          <span>Service Bills & History</span>
+        </a>
 
-                <input type="hidden" id="editOwnerId">
+        <span class="nav-section-label mt-4">Tools & Assistance</span>
+        <a class="nav-link customer-nav-link" data-cust-view="estimator">
+          <i class="fas fa-calculator"></i>
+          <span>Cost Estimator</span>
+        </a>
+        <a class="nav-link customer-nav-link" data-cust-view="profile">
+          <i class="fas fa-ambulance"></i>
+          <span>Profile & 24/7 SOS</span>
+        </a>
+      </nav>
 
-                <div class="form-group">
-                    <label for="name">Owner Name</label>
-                    <input type="text" id="name" placeholder="Enter owner name" required>
-                </div>
+      <!-- SERVICE CENTER / ADMIN SIDE NAVIGATION -->
+      <nav id="sidebar-nav-admin" class="sidebar-nav hidden">
+        <span class="nav-section-label">Service Center Modules</span>
+        <a class="nav-link active" data-tab="dashboard">
+          <i class="fas fa-chart-pie"></i>
+          <span>Operations Overview</span>
+          <span class="nav-member-tag">Lead</span>
+        </a>
+        <a class="nav-link" data-tab="owners">
+          <i class="fas fa-users"></i>
+          <span>Owner Registry</span>
+          <span class="nav-member-tag">M1</span>
+        </a>
+        <a class="nav-link" data-tab="vehicles">
+          <i class="fas fa-car"></i>
+          <span>Vehicles & Fleet</span>
+          <span class="nav-member-tag">M2</span>
+        </a>
+        <a class="nav-link" data-tab="services">
+          <i class="fas fa-wrench"></i>
+          <span>Service & Maintenance</span>
+          <span class="nav-member-tag">M3</span>
+        </a>
+        <a class="nav-link" data-tab="appointments">
+          <i class="fas fa-calendar-check"></i>
+          <span>Appointments</span>
+          <span class="nav-member-tag">M4</span>
+        </a>
 
-                <div class="form-group">
-                    <label for="mobile">Mobile Number</label>
-                    <input type="tel" id="mobile" placeholder="10-digit mobile number" required>
-                </div>
+        <span class="nav-section-label mt-4">Analytics & Reports</span>
+        <a class="nav-link" data-tab="reports">
+          <i class="fas fa-file-invoice-dollar"></i>
+          <span>Expense Reports</span>
+          <span class="nav-member-tag">M5</span>
+        </a>
+      </nav>
 
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" placeholder="Enter email address" required>
-                </div>
+      <div class="sidebar-footer">
+        <div class="flex items-center justify-between mb-2">
+          <span>Demo Environment</span>
+          <button id="btn-reset-demo-data" class="btn btn-xs btn-outline text-xs" title="Reset sample records">
+            <i class="fas fa-sync-alt"></i> Reset Demo
+          </button>
+        </div>
+        <div class="text-xs text-muted">Dual Customer & Workshop Portal</div>
+      </div>
+    </aside>
 
-                <div class="form-group">
-                    <label for="address">Residential Address</label>
-                    <textarea id="address" placeholder="Enter residential address" required></textarea>
-                </div>
+    <!-- MAIN APP CONTENT -->
+    <main class="app-main">
+      <!-- TOP NAVIGATION HEADER -->
+      <header class="app-header">
+        <div class="header-left">
+          <button id="btn-mobile-sidebar-toggle" class="btn btn-outline btn-sm lg:hidden" style="display: none;">
+            <i class="fas fa-bars"></i>
+          </button>
 
-                <button type="submit" id="submitBtn">Register Owner</button>
-                <button type="reset" class="secondary-btn">Clear</button>
+          <!-- Portal Mode Switcher (User Side vs Service Center Side) -->
+          <div class="portal-mode-toggle">
+            <button type="button" class="btn-mode active" id="btn-mode-customer">
+              <i class="fas fa-user-circle"></i> Customer Portal
+            </button>
+            <button type="button" class="btn-mode" id="btn-mode-admin">
+              <i class="fas fa-tools"></i> Service Center Portal
+            </button>
+          </div>
 
-            </form>
+          <!-- Customer Persona Switcher -->
+          <div id="customer-persona-widget" class="customer-persona-box">
+            <span class="text-xs text-muted">Viewing as:</span>
+            <select id="customer-persona-select" class="select select-sm"></select>
+          </div>
+        </div>
 
-        </section>
+        <div class="header-right">
+          <!-- User Profile Display -->
+          <div id="user-profile-display" class="user-profile-widget">
+            <img id="user-header-avatar" src="" alt="Avatar" class="user-avatar-img">
+            <div class="user-details">
+              <span id="user-header-name" class="user-name-text">Loading...</span>
+              <div class="flex items-center gap-1">
+                <span id="user-header-email" class="user-email-text"></span>
+                <span id="user-provider-badge" class="badge"></span>
+              </div>
+            </div>
+            <button id="btn-logout" class="btn btn-xs btn-outline ml-2" title="Sign out of session">
+              <i class="fas fa-sign-out-alt"></i>
+            </button>
+          </div>
+        </div>
+      </header>
 
-        <section class="container">
+      <!-- APPLICATION BODY VIEWS -->
+      <div class="app-content">
 
-            <h2>Registered Owners</h2>
+        <!-- ************************************************************* -->
+        <!-- PART A: CUSTOMER / USER PORTAL WRAPPER -->
+        <!-- ************************************************************* -->
+        <div id="customer-views-wrapper">
 
-            <input
-                type="search"
-                id="searchInput"
-                placeholder="Search by name, ID or mobile number"
-            >
-
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Owner ID</th>
-                            <th>Name</th>
-                            <th>Mobile</th>
-                            <th>Email</th>
-                            <th>Address</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-
-                    <tbody id="ownerTableBody">
-                    </tbody>
-                </table>
+          <!-- 1. CUSTOMER DASHBOARD SUBVIEW -->
+          <section id="cust-view-dashboard" class="customer-subview">
+            <div class="section-header-bar">
+              <div>
+                <h1>Welcome, <span id="cust-welcome-name">Valued Customer</span> </h1>
+                <p>Welcome to your personal vehicle maintenance dashboard. Monitor your fleet health, upcoming bookings, and service documents.</p>
+              </div>
+              <div class="flex gap-2">
+                <button class="btn btn-primary btn-sm" onclick="CustomerModule.showCustomerView('book')">
+                  <i class="fas fa-calendar-plus"></i> Book Service
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="CustomerModule.openAddVehicleModal()">
+                  <i class="fas fa-plus"></i> Add Vehicle
+                </button>
+              </div>
             </div>
 
-        </section>
+            <!-- Expiry Warning Alert Banner -->
+            <div id="cust-expiry-alert-banner" class="hidden"></div>
 
-        <section class="container" id="profileSection" hidden>
-            <h2>Owner Profile</h2>
-            <div id="profileDetails"></div>
-            <button type="button" class="secondary-btn" id="closeProfile">
-                Close Profile
-            </button>
-        </section>
+            <!-- Customer KPI Metrics -->
+            <div class="kpi-grid">
+              <div class="kpi-card">
+                <div class="kpi-icon blue"><i class="fas fa-car-side"></i></div>
+                <div>
+                  <div class="kpi-label">Vehicles in My Garage</div>
+                  <div id="cust-kpi-vehicles" class="kpi-value">0</div>
+                </div>
+              </div>
 
+              <div class="kpi-card">
+                <div class="kpi-icon orange"><i class="fas fa-clock"></i></div>
+                <div>
+                  <div class="kpi-label">Active Bookings</div>
+                  <div id="cust-kpi-active-bookings" class="kpi-value">0</div>
+                </div>
+              </div>
+
+              <div class="kpi-card">
+                <div class="kpi-icon green"><i class="fas fa-check-circle"></i></div>
+                <div>
+                  <div class="kpi-label">Completed Services</div>
+                  <div id="cust-kpi-services-done" class="kpi-value">0</div>
+                </div>
+              </div>
+
+              <div class="kpi-card">
+                <div class="kpi-icon purple"><i class="fas fa-coins"></i></div>
+                <div>
+                  <div class="kpi-label">Maintenance Invested</div>
+                  <div id="cust-kpi-total-invested" class="kpi-value">₹0</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2-Column Overview -->
+            <div class="dashboard-grid-2">
+              <div class="card">
+                <div class="flex justify-between items-center mb-3">
+                  <h3 class="card-title mb-0"><i class="fas fa-warehouse text-brand"></i> My Garage Quick View</h3>
+                  <button class="btn btn-xs btn-outline" onclick="CustomerModule.showCustomerView('garage')">View All</button>
+                </div>
+                <div class="text-xs text-muted mb-3">Your vehicles currently registered with AutoCare:</div>
+                <div id="cust-garage-cards-container" class="cards-grid">
+                  <!-- Dynamically rendered -->
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="flex justify-between items-center mb-3">
+                  <h3 class="card-title mb-0"><i class="fas fa-tools text-brand"></i> Recommended Service Packages</h3>
+                  <button class="btn btn-xs btn-outline" onclick="CustomerModule.showCustomerView('book')">See Packages</button>
+                </div>
+                <div class="text-xs text-muted mb-3">All services include multi-point safety inspection & transparent pricing:</div>
+                <div class="doc-status-pills">
+                  <div class="doc-badge-chip doc-valid py-2">
+                    <i class="fas fa-oil-can"></i>
+                    <div>
+                      <strong>Periodic Synthetic Service (₹5,499)</strong>
+                      <div class="text-xs">Engine oil, air filter, brake inspection, suspension check.</div>
+                    </div>
+                  </div>
+                  <div class="doc-badge-chip doc-valid py-2">
+                    <i class="fas fa-snowflake"></i>
+                    <div>
+                      <strong>AC Recharge & Sanitization (₹2,200)</strong>
+                      <div class="text-xs">Gas top-up, antibacterial mist, cabin filter cleaning.</div>
+                    </div>
+                  </div>
+                  <div class="doc-badge-chip doc-valid py-2">
+                    <i class="fas fa-compact-disc"></i>
+                    <div>
+                      <strong>Brake System Overhaul (₹3,800)</strong>
+                      <div class="text-xs">Brake pads replacement, disc resurfacing, fluid flush.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+
+          <!-- 2. MY GARAGE SUBVIEW -->
+          <section id="cust-view-garage" class="customer-subview hidden">
+            <div class="section-header-bar">
+              <div>
+                <h1>My Vehicle Garage</h1>
+                <p>View all your registered cars, monitor insurance and PUC expiration status, and manage vehicle assets.</p>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="CustomerModule.openAddVehicleModal()">
+                <i class="fas fa-plus-circle"></i> Add Vehicle to Garage
+              </button>
+            </div>
+
+            <div id="cust-garage-cards-container-full" class="cards-grid">
+              <!-- Re-used from garage render -->
+            </div>
+          </section>
+
+
+          <!-- 3. BOOK SERVICE WIZARD SUBVIEW -->
+          <section id="cust-view-book" class="customer-subview hidden">
+            <div class="section-header-bar">
+              <div>
+                <h1>Book a Service Appointment</h1>
+                <p>Choose your car, select a transparent service package, pick a convenient date & time slot.</p>
+              </div>
+            </div>
+
+            <div class="card mb-4">
+              <h3 class="card-title"><i class="fas fa-box-open text-brand"></i> Step 1: Select Service Package</h3>
+              <p class="text-xs text-muted mb-3">Pick an all-inclusive package with upfront pricing (no hidden charges):</p>
+              <div id="cust-packages-grid" class="packages-grid">
+                <!-- Dynamically populated package cards -->
+              </div>
+
+              <hr class="my-4 border-subtle">
+
+              <h3 class="card-title"><i class="fas fa-calendar-check text-brand"></i> Step 2: Vehicle & Scheduling Details</h3>
+              <form id="form-customer-book-service">
+                <input type="hidden" id="cust-book-service-type" value="Comprehensive Periodic Service">
+
+                <div class="form-grid-2">
+                  <div class="form-group">
+                    <label class="form-label required" for="cust-book-vehicle-select">Select Vehicle from Your Garage</label>
+                    <select id="cust-book-vehicle-select" class="select" required></select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label required" for="cust-book-date">Preferred Service Date</label>
+                    <input type="date" id="cust-book-date" class="input" required>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label required">Choose Convenient Time Slot</label>
+                  <div id="cust-time-slots-container" class="slots-grid">
+                    <!-- Dynamic chips -->
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="cust-book-notes">Additional Symptoms / Instructions (Optional)</label>
+                  <textarea id="cust-book-notes" class="textarea" placeholder="E.g., front left tire feels low on pressure, brake squeaking..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="min-width: 200px;">
+                  <i class="fas fa-check-circle"></i> Confirm My Booking
+                </button>
+              </form>
+            </div>
+          </section>
+
+
+          <!-- 4. LIVE SERVICE TRACKER & BOOKINGS SUBVIEW -->
+          <section id="cust-view-bookings" class="customer-subview hidden">
+            <div class="section-header-bar">
+              <div>
+                <h1>Live Service Tracker & Bookings</h1>
+                <p>Track your vehicle's real-time maintenance status from appointment booking to pickup.</p>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="CustomerModule.showCustomerView('book')">
+                <i class="fas fa-calendar-plus"></i> New Booking
+              </button>
+            </div>
+
+            <div id="cust-appointments-list-container">
+              <!-- Dynamically rendered booking tracker cards -->
+            </div>
+          </section>
+
+
+          <!-- 5. SERVICE BILLS & INVOICES SUBVIEW -->
+          <section id="cust-view-invoices" class="customer-subview hidden">
+            <div class="section-header-bar">
+              <div>
+                <h1>Service Bills & Invoices</h1>
+                <p>Itemized maintenance bills, spare parts installed, labor charges, and printable tax receipts.</p>
+              </div>
+            </div>
+
+            <div class="card">
+              <div id="cust-invoices-list-container">
+                <!-- Dynamically rendered invoices table -->
+              </div>
+            </div>
+          </section>
+
+
+          <!-- 6. COST ESTIMATOR SUBVIEW -->
+          <section id="cust-view-estimator" class="customer-subview hidden">
+            <div class="section-header-bar">
+              <div>
+                <h1>Instant Service Cost Estimator</h1>
+                <p>Calculate an accurate upfront price estimate before you book your service visit.</p>
+              </div>
+            </div>
+
+            <div class="estimator-calc-grid">
+              <div class="card">
+                <h3 class="card-title"><i class="fas fa-gas-pump text-brand"></i> 1. Choose Fuel Type</h3>
+                <div class="flex gap-4 mb-4">
+                  <label class="flex items-center gap-1 cursor-pointer">
+                    <input type="radio" name="est-fuel" value="Petrol" class="estimator-trigger" checked>
+                    <span>Petrol</span>
+                  </label>
+                  <label class="flex items-center gap-1 cursor-pointer">
+                    <input type="radio" name="est-fuel" value="Diesel" class="estimator-trigger">
+                    <span>Diesel</span>
+                  </label>
+                  <label class="flex items-center gap-1 cursor-pointer">
+                    <input type="radio" name="est-fuel" value="Electric" class="estimator-trigger">
+                    <span>Electric (EV)</span>
+                  </label>
+                </div>
+
+                <h3 class="card-title mt-4"><i class="fas fa-tools text-brand"></i> 2. Select Services & Replacements Needed</h3>
+                <div class="calc-checklist-box">
+                  <label class="calc-check-card">
+                    <input type="checkbox" class="est-checkbox estimator-trigger" value="3200" checked>
+                    <div>
+                      <strong>Full Synthetic Engine Oil</strong>
+                      <div class="text-xs text-muted">+₹3,200</div>
+                    </div>
+                  </label>
+
+                  <label class="calc-check-card">
+                    <input type="checkbox" class="est-checkbox estimator-trigger" value="480" checked>
+                    <div>
+                      <strong>OEM Oil Filter Cartridge</strong>
+                      <div class="text-xs text-muted">+₹480</div>
+                    </div>
+                  </label>
+
+                  <label class="calc-check-card">
+                    <input type="checkbox" class="est-checkbox estimator-trigger" value="850">
+                    <div>
+                      <strong>Cabin Air Filter</strong>
+                      <div class="text-xs text-muted">+₹850</div>
+                    </div>
+                  </label>
+
+                  <label class="calc-check-card">
+                    <input type="checkbox" class="est-checkbox estimator-trigger" value="4200">
+                    <div>
+                      <strong>Ceramic Front Brake Pads</strong>
+                      <div class="text-xs text-muted">+₹4,200</div>
+                    </div>
+                  </label>
+
+                  <label class="calc-check-card">
+                    <input type="checkbox" class="est-checkbox estimator-trigger" value="1200">
+                    <div>
+                      <strong>Wheel Alignment & Balancing</strong>
+                      <div class="text-xs text-muted">+₹1,200</div>
+                    </div>
+                  </label>
+
+                  <label class="calc-check-card">
+                    <input type="checkbox" class="est-checkbox estimator-trigger" value="1800">
+                    <div>
+                      <strong>AC Gas Replenishment</strong>
+                      <div class="text-xs text-muted">+₹1,800</div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Calculation Result Panel -->
+              <div class="calc-summary-panel">
+                <h3 class="font-bold text-lg mb-3">Estimated Quote</h3>
+                <div class="flex justify-between text-sm py-1 border-b">
+                  <span>Standard Labor:</span>
+                  <span id="est-base-labor" class="font-mono">₹1,400</span>
+                </div>
+                <div class="flex justify-between text-sm py-1 border-b">
+                  <span>Selected Parts:</span>
+                  <span id="est-parts-sum" class="font-mono">₹3,680</span>
+                </div>
+                <div class="flex justify-between text-sm py-1 border-b">
+                  <span>Estimated GST (18%):</span>
+                  <span id="est-gst" class="font-mono">₹914</span>
+                </div>
+                <div class="flex justify-between text-lg font-bold py-2 mt-2 text-brand">
+                  <span>Total Estimate:</span>
+                  <span id="est-grand-total" class="font-mono">₹5,994</span>
+                </div>
+                <button class="btn btn-primary full-width mt-4" style="width: 100%;" onclick="CustomerModule.showCustomerView('book')">
+                  Book with this Estimate
+                </button>
+              </div>
+            </div>
+          </section>
+
+
+          <!-- 7. PROFILE & SOS ROADSIDE ASSISTANCE SUBVIEW -->
+          <section id="cust-view-profile" class="customer-subview hidden">
+            <div class="section-header-bar">
+              <div>
+                <h1>Profile & Emergency Assistance</h1>
+                <p>Manage your contact details and access 24/7 Roadside Breakdown & Towing Assistance.</p>
+              </div>
+            </div>
+
+            <div class="emergency-sos-card mb-4">
+              <div>
+                <span class="badge badge-danger mb-1"><i class="fas fa-shield-alt"></i> 24/7 AutoCare SOS</span>
+                <h2 class="text-xl font-bold text-danger">Emergency Roadside Assistance Hotline</h2>
+                <p class="text-xs text-muted mt-1">Flat tire, engine failure, dead battery, or towing support anywhere nationwide.</p>
+              </div>
+              <a href="tel:18002008899" class="sos-call-btn">
+                <i class="fas fa-phone-alt"></i> Call 1800-200-8899
+              </a>
+            </div>
+
+            <div class="card">
+              <h3 class="card-title"><i class="fas fa-user-edit text-brand"></i> My Personal Contact Information</h3>
+              <form id="form-customer-profile-update">
+                <div class="form-grid-2">
+                  <div class="form-group">
+                    <label class="form-label" for="cust-prof-id">Customer / Owner ID</label>
+                    <input type="text" id="cust-prof-id" class="input font-mono" readonly style="background:#f1f5f9;">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label required" for="cust-prof-name">Full Name</label>
+                    <input type="text" id="cust-prof-name" class="input" required>
+                  </div>
+                </div>
+
+                <div class="form-grid-2">
+                  <div class="form-group">
+                    <label class="form-label required" for="cust-prof-mobile">Mobile Number (10 Digits)</label>
+                    <input type="tel" id="cust-prof-mobile" class="input font-mono" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label required" for="cust-prof-email">Email Address</label>
+                    <input type="email" id="cust-prof-email" class="input" required>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label required" for="cust-prof-address">Registered Address</label>
+                  <textarea id="cust-prof-address" class="textarea" required></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save"></i> Save Profile Details
+                </button>
+              </form>
+            </div>
+          </section>
+
+        </div>
+
+
+        <!-- ************************************************************* -->
+        <!-- PART B: SERVICE CENTER / ADMIN PORTAL WRAPPER -->
+        <!-- ************************************************************* -->
+        <div id="admin-views-wrapper" class="hidden">
+
+          <!-- VIEW 1: DASHBOARD & EXECUTIVE OVERVIEW (MEMBER 5) -->
+          <section id="view-dashboard" class="tab-view-container">
+            <div class="section-header-bar">
+              <div>
+                <h1>Executive Operations Dashboard</h1>
+                <p>Real-time fleet health, upcoming appointments, maintenance costs, and document compliance.</p>
+              </div>
+              <div class="flex gap-2">
+                <button class="btn btn-primary btn-sm" id="dash-btn-book-apt">
+                  <i class="fas fa-calendar-plus"></i> Book Service
+                </button>
+                <button class="btn btn-secondary btn-sm" id="dash-btn-add-vehicle">
+                  <i class="fas fa-plus"></i> Add Vehicle
+                </button>
+              </div>
+            </div>
+
+            <!-- KPI Metric Cards -->
+            <div class="kpi-grid">
+              <div class="kpi-card">
+                <div class="kpi-icon blue"><i class="fas fa-users"></i></div>
+                <div>
+                  <div class="kpi-label">Registered Owners</div>
+                  <div id="kpi-total-owners" class="kpi-value">0</div>
+                </div>
+              </div>
+
+              <div class="kpi-card">
+                <div class="kpi-icon green"><i class="fas fa-car-side"></i></div>
+                <div>
+                  <div class="kpi-label">Fleet Vehicles</div>
+                  <div id="kpi-total-vehicles" class="kpi-value">0</div>
+                </div>
+              </div>
+
+              <div class="kpi-card">
+                <div class="kpi-icon purple"><i class="fas fa-receipt"></i></div>
+                <div>
+                  <div class="kpi-label">Total Maintenance Spend</div>
+                  <div id="kpi-total-expense" class="kpi-value">₹0</div>
+                </div>
+              </div>
+
+              <div class="kpi-card">
+                <div class="kpi-icon orange"><i class="fas fa-clock"></i></div>
+                <div>
+                  <div class="kpi-label">Active Appointments</div>
+                  <div id="kpi-active-appointments" class="kpi-value">0</div>
+                </div>
+              </div>
+
+              <div class="kpi-card">
+                <div class="kpi-icon red"><i class="fas fa-exclamation-triangle"></i></div>
+                <div>
+                  <div class="kpi-label">Expiring Documents</div>
+                  <div id="kpi-critical-alerts" class="kpi-value">0</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2-Column Dashboard Layout -->
+            <div class="dashboard-grid-2">
+              <div class="card">
+                <div class="flex items-center justify-between mb-3">
+                  <h3 class="card-title mb-0"><i class="fas fa-bell text-brand"></i> Upcoming Service Reminders</h3>
+                  <button class="btn btn-xs btn-outline" onclick="App.navigateTo('appointments')">View All</button>
+                </div>
+                <div id="dash-reminders-list"></div>
+              </div>
+
+              <div class="card">
+                <div class="flex items-center justify-between mb-3">
+                  <h3 class="card-title mb-0"><i class="fas fa-shield-alt text-danger"></i> Document Expiry Tracker (PUC / Insurance)</h3>
+                  <span class="badge badge-warning text-xs">Compliance Audit</span>
+                </div>
+                <div id="dash-expiry-tracker-list"></div>
+              </div>
+            </div>
+
+            <!-- Bottom Charts Row -->
+            <div class="dashboard-grid-2">
+              <div class="card">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="card-title mb-0"><i class="fas fa-chart-bar text-brand"></i> Maintenance Expense by Vehicle</h3>
+                  <span class="text-xs text-muted font-mono">Real-time spend</span>
+                </div>
+                <div id="expense-bar-chart-container"></div>
+              </div>
+
+              <div class="card">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="card-title mb-0"><i class="fas fa-tools text-brand"></i> Service Types Distribution</h3>
+                  <span class="text-xs text-muted">Breakdown</span>
+                </div>
+                <div id="service-type-distribution-container" class="mt-4"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- VIEW 2: OWNER REGISTRATION & PROFILES (MEMBER 1) -->
+          <section id="view-owners" class="tab-view-container hidden">
+            <div class="section-header-bar">
+              <div>
+                <h1>Member 1: Owner Registration & Profile Management</h1>
+                <p>Register owners, validate mobile & email, store in LocalStorage, edit and view profiles.</p>
+              </div>
+              <span id="owners-count-badge" class="badge badge-primary">0 Registered</span>
+            </div>
+
+            <div class="view-split-layout">
+              <div class="card">
+                <h3 class="card-title"><i class="fas fa-user-plus text-brand"></i> Register Vehicle Owner</h3>
+                <p class="text-xs text-muted mb-4">Fill in owner contact details. Form enforces regex validations.</p>
+                <div id="owner-form-errors" class="form-error-box hidden"></div>
+                <form id="form-owner-register">
+                  <div class="form-group">
+                    <div class="flex justify-between items-center mb-1">
+                      <label class="form-label required" for="owner-id-input">Owner ID</label>
+                      <button type="button" id="btn-generate-owner-id" class="btn btn-xs btn-outline">
+                        <i class="fas fa-magic"></i> Auto Gen
+                      </button>
+                    </div>
+                    <input type="text" id="owner-id-input" class="input font-mono" placeholder="e.g. OWN-1004" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label required" for="owner-name-input">Full Name</label>
+                    <input type="text" id="owner-name-input" class="input" placeholder="e.g. Rajesh Kumar" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label required" for="owner-mobile-input">Mobile Number (10 Digits)</label>
+                    <input type="tel" id="owner-mobile-input" class="input font-mono" placeholder="e.g. 9876543210" maxlength="10" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label required" for="owner-email-input">Email Address</label>
+                    <input type="email" id="owner-email-input" class="input" placeholder="e.g. rajesh.k@example.com" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label required" for="owner-address-input">Residential Address</label>
+                    <textarea id="owner-address-input" class="textarea" placeholder="Flat No, Building, Street, City, State" required></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary full-width" style="width: 100%;">
+                    <i class="fas fa-save"></i> Register Owner
+                  </button>
+                </form>
+              </div>
+
+              <div>
+                <div class="card mb-4" style="padding: 1rem 1.25rem;">
+                  <div class="flex items-center gap-2">
+                    <i class="fas fa-search text-muted"></i>
+                    <input type="text" id="owner-search-input" class="input" placeholder="Search owners by name, ID, email, or mobile...">
+                  </div>
+                </div>
+                <div id="owners-list-container" class="cards-grid"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- VIEW 3: VEHICLE REGISTRATION & FLEET (MEMBER 2) -->
+          <section id="view-vehicles" class="tab-view-container hidden">
+            <div class="section-header-bar">
+              <div>
+                <h1>Member 2: Vehicle Registration & Dashboard</h1>
+                <p>Register vehicles, connect with Owner IDs, track fuel types, manage updates & deletions.</p>
+              </div>
+              <span id="vehicles-count-badge" class="badge badge-primary">0 Vehicles</span>
+            </div>
+
+            <div class="view-split-layout">
+              <div class="card">
+                <h3 class="card-title"><i class="fas fa-car-side text-brand"></i> Register Vehicle</h3>
+                <p class="text-xs text-muted mb-4">Connect vehicle specifications with a registered owner.</p>
+                <div id="vehicle-form-errors" class="form-error-box hidden"></div>
+                <form id="form-vehicle-register">
+                  <div class="form-group">
+                    <div class="flex justify-between items-center mb-1">
+                      <label class="form-label required" for="veh-id-input">Vehicle System ID</label>
+                      <button type="button" id="btn-generate-veh-id" class="btn btn-xs btn-outline">
+                        <i class="fas fa-magic"></i> Auto
+                      </button>
+                    </div>
+                    <input type="text" id="veh-id-input" class="input font-mono" placeholder="VEH-205">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label required" for="veh-owner-input">Associated Owner</label>
+                    <select id="veh-owner-input" class="select owner-select-dropdown" required></select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label required" for="veh-reg-input">Registration Number</label>
+                    <input type="text" id="veh-reg-input" class="input font-mono" placeholder="e.g. MH 02 CL 4589" required>
+                  </div>
+                  <div class="form-grid-2">
+                    <div class="form-group">
+                      <label class="form-label required" for="veh-make-input">Manufacturer</label>
+                      <input type="text" id="veh-make-input" class="input" placeholder="e.g. Tata, Hyundai, BMW" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label required" for="veh-model-input">Model</label>
+                      <input type="text" id="veh-model-input" class="input" placeholder="e.g. Nexon EV, Creta" required>
+                    </div>
+                  </div>
+                  <div class="form-grid-2">
+                    <div class="form-group">
+                      <label class="form-label required" for="veh-fuel-input">Fuel Type</label>
+                      <select id="veh-fuel-input" class="select" required>
+                        <option value="Petrol">Petrol</option>
+                        <option value="Diesel">Diesel</option>
+                        <option value="Electric">Electric (EV)</option>
+                        <option value="Hybrid">Hybrid</option>
+                        <option value="CNG">CNG</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label required" for="veh-date-input">Purchase Date</label>
+                      <input type="date" id="veh-date-input" class="input" required>
+                    </div>
+                  </div>
+                  <div class="form-grid-2">
+                    <div class="form-group">
+                      <label class="form-label" for="veh-insurance-input">Insurance Expiry</label>
+                      <input type="date" id="veh-insurance-input" class="input">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="veh-puc-input">PUC Expiry Date</label>
+                      <input type="date" id="veh-puc-input" class="input">
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary full-width" style="width: 100%;">
+                    <i class="fas fa-plus-circle"></i> Register Vehicle
+                  </button>
+                </form>
+              </div>
+
+              <div>
+                <div class="card mb-4" style="padding: 1rem 1.25rem;">
+                  <div class="form-grid-3">
+                    <input type="text" id="vehicle-search-input" class="input" placeholder="Search by Reg #, Make, Model...">
+                    <select id="vehicle-fuel-filter" class="select">
+                      <option value="">All Fuel Types</option>
+                      <option value="Petrol">Petrol</option>
+                      <option value="Diesel">Diesel</option>
+                      <option value="Electric">Electric</option>
+                      <option value="Hybrid">Hybrid</option>
+                      <option value="CNG">CNG</option>
+                    </select>
+                    <select id="vehicle-owner-filter" class="select">
+                      <option value="">All Owners</option>
+                    </select>
+                  </div>
+                </div>
+                <div id="vehicles-list-container" class="cards-grid"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- VIEW 4: SERVICE HISTORY & MAINTENANCE (MEMBER 3) -->
+          <section id="view-services" class="tab-view-container hidden">
+            <div class="section-header-bar">
+              <div>
+                <h1>Member 3: Service History & Maintenance</h1>
+                <p>Log workshop records, manage spare parts inventory items, auto-calculate expenses & view invoices.</p>
+              </div>
+              <span id="services-count-badge" class="badge badge-primary">0 Records</span>
+            </div>
+
+            <div class="card mb-4">
+              <h3 class="card-title"><i class="fas fa-clipboard-list text-brand"></i> Add New Service Record</h3>
+              <form id="form-service-add">
+                <div class="form-grid-3">
+                  <div class="form-group">
+                    <label class="form-label required" for="srv-vehicle-input">Target Vehicle</label>
+                    <select id="srv-vehicle-input" class="select vehicle-select-dropdown" required></select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Linked Owner (Auto-filled)</label>
+                    <input type="text" id="srv-owner-display" class="input" readonly placeholder="Select a vehicle first" style="background:#f1f5f9;">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label required" for="srv-date-input">Service Date</label>
+                    <input type="date" id="srv-date-input" class="input" required>
+                  </div>
+                </div>
+
+                <div class="form-grid-3">
+                  <div class="form-group">
+                    <label class="form-label required" for="srv-center-input">Service Center Name</label>
+                    <input type="text" id="srv-center-input" class="input" placeholder="e.g. Apex Authorized Service Station" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="srv-contact-input">Workshop Phone / Contact</label>
+                    <input type="text" id="srv-contact-input" class="input" placeholder="+91 98112 00000">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label required" for="srv-type-input">Service Classification</label>
+                    <select id="srv-type-input" class="select" required>
+                      <option value="Periodic Maintenance">Periodic Maintenance</option>
+                      <option value="Brake System">Brake System</option>
+                      <option value="Engine & Transmission">Engine & Transmission</option>
+                      <option value="EV Diagnostics & Service">EV Diagnostics & Service</option>
+                      <option value="Electrical & Battery">Electrical & Battery</option>
+                      <option value="Suspension & Steering">Suspension & Steering</option>
+                      <option value="Accidental Repair">Accidental Repair</option>
+                      <option value="Full Detailing & Wash">Full Detailing & Wash</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label required" for="srv-desc-input">Service Description / Job Card Summary</label>
+                  <textarea id="srv-desc-input" class="textarea" placeholder="Describe work done, problems addressed, inspections performed..." required></textarea>
+                </div>
+
+                <!-- Dynamic Spare Parts Line Items Builder (Member 3) -->
+                <div class="parts-builder-box">
+                  <div class="parts-header-bar">
+                    <div>
+                      <h4 class="font-bold"><i class="fas fa-cogs"></i> Spare Parts Information</h4>
+                      <span class="text-xs text-muted">Add parts, consumables, SKU numbers, quantities and unit pricing</span>
+                    </div>
+                    <button type="button" id="btn-add-spare-part" class="btn btn-xs btn-primary">
+                      <i class="fas fa-plus"></i> Add Spare Part
+                    </button>
+                  </div>
+
+                  <div class="table-responsive">
+                    <table class="table table-compact">
+                      <thead>
+                        <tr>
+                          <th>Part / Item Name</th>
+                          <th>Part / SKU #</th>
+                          <th style="width: 80px;">Qty</th>
+                          <th style="width: 110px;">Unit Price (₹)</th>
+                          <th>Subtotal</th>
+                          <th style="width: 40px;"></th>
+                        </tr>
+                      </thead>
+                      <tbody id="service-parts-table-body"></tbody>
+                    </table>
+                  </div>
+
+                  <div class="totals-summary-card">
+                    <div class="summary-row">
+                      <span>Parts Subtotal:</span>
+                      <span id="service-parts-total" class="font-mono font-bold">₹0</span>
+                    </div>
+                    <div class="summary-row items-center">
+                      <label for="service-labor-cost">Labor & Technical Charges (₹):</label>
+                      <input type="number" id="service-labor-cost" class="input input-sm font-mono text-right" style="width: 120px;" min="0" value="0">
+                    </div>
+                    <div class="summary-row items-center">
+                      <label for="service-tax-rate">Applicable GST / Tax (%):</label>
+                      <input type="number" id="service-tax-rate" class="input input-sm font-mono text-right" style="width: 120px;" min="0" max="100" value="18">
+                    </div>
+                    <div class="summary-row grand-total-row">
+                      <span>Total Service Expense:</span>
+                      <span id="service-grand-total" class="font-mono font-bold">₹0</span>
+                    </div>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-2">
+                  <i class="fas fa-check-circle"></i> Save & Log Service Record
+                </button>
+              </form>
+            </div>
+
+            <div class="card">
+              <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                <h3 class="card-title mb-0"><i class="fas fa-history text-brand"></i> Service History Log</h3>
+                <div class="flex gap-2">
+                  <input type="text" id="service-search-input" class="input input-sm" placeholder="Search records...">
+                  <select id="service-type-filter" class="select input-sm">
+                    <option value="">All Service Types</option>
+                    <option value="Periodic Maintenance">Periodic Maintenance</option>
+                    <option value="Brake System">Brake System</option>
+                    <option value="EV Diagnostics & Service">EV Diagnostics</option>
+                  </select>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Record ID / Date</th>
+                      <th>Vehicle</th>
+                      <th>Owner</th>
+                      <th>Workshop / Type</th>
+                      <th>Spare Parts</th>
+                      <th>Total Expense</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="services-table-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- VIEW 5: APPOINTMENT BOOKING (MEMBER 4) -->
+          <section id="view-appointments" class="tab-view-container hidden">
+            <div class="section-header-bar">
+              <div>
+                <h1>Member 4: Appointment Booking & Management</h1>
+                <p>Interactive scheduling, service types, time-slot picker, instant booking confirmation & rescheduling.</p>
+              </div>
+              <span id="appointments-count-badge" class="badge badge-primary">0 Total</span>
+            </div>
+
+            <div class="view-split-layout">
+              <div class="card">
+                <h3 class="card-title"><i class="fas fa-calendar-alt text-brand"></i> Book Service Appointment</h3>
+                <p class="text-xs text-muted mb-4">Choose vehicle, service category and pick an available slot.</p>
+                <form id="form-appointment-book">
+                  <div class="form-group">
+                    <label class="form-label required" for="apt-vehicle-input">Select Vehicle</label>
+                    <select id="apt-vehicle-input" class="select vehicle-select-dropdown" required></select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Vehicle Owner (Auto-filled)</label>
+                    <input type="text" id="apt-owner-display" class="input" readonly placeholder="Auto-populated" style="background:#f1f5f9;">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label required" for="apt-service-type">Service Required</label>
+                    <select id="apt-service-type" class="select" required>
+                      <option value="Comprehensive Periodic Service">Comprehensive Periodic Service</option>
+                      <option value="General Health Inspection">General Health Inspection</option>
+                      <option value="Tire Rotation & Balance">Tire Rotation & Balance</option>
+                      <option value="Brake Pad Check & Flush">Brake Pad Check & Flush</option>
+                      <option value="AC Filter & Gas Top-up">AC Filter & Gas Top-up</option>
+                      <option value="Battery Health & Electrical Check">Battery Health & Electrical Check</option>
+                      <option value="Car Detailing & Foam Wash">Car Detailing & Foam Wash</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label required" for="apt-date-input">Appointment Date</label>
+                    <input type="date" id="apt-date-input" class="input" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label required">Select Time Slot</label>
+                    <div id="time-slots-container" class="slots-grid"></div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="apt-notes-input">Special Instructions / Symptoms</label>
+                    <textarea id="apt-notes-input" class="textarea" placeholder="E.g. unusual engine ticking sound, steering pull to left..."></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary full-width" style="width: 100%;">
+                    <i class="fas fa-calendar-check"></i> Confirm Appointment
+                  </button>
+                </form>
+              </div>
+
+              <div>
+                <div class="apt-status-tab-bar">
+                  <button class="apt-status-tab active" data-status="all">All</button>
+                  <button class="apt-status-tab" data-status="Confirmed">Confirmed</button>
+                  <button class="apt-status-tab" data-status="Pending">Pending</button>
+                  <button class="apt-status-tab" data-status="Rescheduled">Rescheduled</button>
+                  <button class="apt-status-tab" data-status="Completed">Completed</button>
+                  <button class="apt-status-tab" data-status="Cancelled">Cancelled</button>
+                </div>
+                <div id="appointments-cards-container" class="cards-grid"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- VIEW 6: EXPENSE REPORTS & INTEGRATION (MEMBER 5) -->
+          <section id="view-reports" class="tab-view-container hidden">
+            <div class="section-header-bar">
+              <div>
+                <h1>Member 5: Reports, Analytics & System Integration</h1>
+                <p>Audited fleet expenses, parts vs labor breakdown, CSV export, and print-ready reports.</p>
+              </div>
+              <div class="flex gap-2">
+                <button id="btn-export-csv" class="btn btn-secondary btn-sm">
+                  <i class="fas fa-file-csv"></i> Export CSV
+                </button>
+                <button id="btn-print-report" class="btn btn-primary btn-sm">
+                  <i class="fas fa-print"></i> Print Report
+                </button>
+              </div>
+            </div>
+
+            <div class="card mb-4">
+              <h3 class="card-title"><i class="fas fa-chart-line text-brand"></i> Fleet Maintenance Expense Summary</h3>
+              <p class="text-xs text-muted mb-4">Cumulative repair & spare parts expenditure grouped per registered vehicle.</p>
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Vehicle Details</th>
+                      <th>Owner</th>
+                      <th class="text-center">Total Services</th>
+                      <th>Parts Total</th>
+                      <th>Labor Total</th>
+                      <th>Total Spend</th>
+                    </tr>
+                  </thead>
+                  <tbody id="report-expenses-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3 class="card-title"><i class="fas fa-project-diagram text-brand"></i> System Integration Matrix</h3>
+              <p class="text-xs text-muted mb-3">Live data interconnectivity between all 5 project modules:</p>
+              <div class="form-grid-3">
+                <div class="card" style="background: var(--surface-bg);">
+                  <span class="badge badge-primary mb-2">Member 1  Member 2</span>
+                  <p class="text-xs">Owners register first; Vehicles link to unique Owner IDs with relationship validation.</p>
+                </div>
+                <div class="card" style="background: var(--surface-bg);">
+                  <span class="badge badge-primary mb-2">Member 2  Member 3 & 4</span>
+                  <p class="text-xs">Vehicles dynamically populate Service History dropdowns and Appointment booking selectors.</p>
+                </div>
+                <div class="card" style="background: var(--surface-bg);">
+                  <span class="badge badge-primary mb-2">Member 3, 4  Member 5</span>
+                  <p class="text-xs">Real-time aggregate computations drive KPI cards, expense charts, and upcoming reminders.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+      </div>
     </main>
+  </div>
 
-    <!-- Connecting JavaScript -->
-    <script src="script.js"></script>
 
+  <!-- ========================================== -->
+  <!-- MODALS SECTION -->
+  <!-- ========================================== -->
+
+  <!-- CUSTOMER ADD VEHICLE MODAL -->
+  <div id="modal-customer-add-vehicle" class="modal-overlay customer-modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fas fa-car text-brand"></i> Add Vehicle to My Garage</h3>
+        <button class="modal-close-btn" onclick="CustomerModule.closeModals()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-customer-add-vehicle">
+          <div class="form-group">
+            <label class="form-label required" for="cust-veh-reg">Registration Plate Number</label>
+            <input type="text" id="cust-veh-reg" class="input font-mono" placeholder="e.g. KA 05 MC 1234" required>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label required" for="cust-veh-make">Manufacturer / Brand</label>
+              <input type="text" id="cust-veh-make" class="input" placeholder="e.g. Tata, Hyundai, Honda" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label required" for="cust-veh-model">Car Model</label>
+              <input type="text" id="cust-veh-model" class="input" placeholder="e.g. Nexon, Creta, City" required>
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label required" for="cust-veh-fuel">Fuel Type</label>
+              <select id="cust-veh-fuel" class="select" required>
+                <option value="Petrol">Petrol</option>
+                <option value="Diesel">Diesel</option>
+                <option value="Electric">Electric (EV)</option>
+                <option value="Hybrid">Hybrid</option>
+                <option value="CNG">CNG</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label required" for="cust-veh-date">Purchase Date</label>
+              <input type="date" id="cust-veh-date" class="input" required>
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="cust-veh-insurance">Insurance Expiry Date</label>
+              <input type="date" id="cust-veh-insurance" class="input">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="cust-veh-puc">PUC Expiry Date</label>
+              <input type="date" id="cust-veh-puc" class="input">
+            </div>
+          </div>
+          <div class="flex justify-end gap-2 mt-4">
+            <button type="button" class="btn btn-secondary" onclick="CustomerModule.closeModals()">Cancel</button>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Add to Garage</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTHENTICATION OVERLAY MODAL -->
+  <div id="auth-overlay-modal" class="modal-overlay hidden">
+    <div class="modal-content" style="max-width: 440px;">
+      <div class="modal-body text-center" style="padding: 2rem;">
+        <div class="brand-icon-box mx-auto mb-3" style="margin: 0 auto 1rem;">
+          <i class="fas fa-car-alt"></i>
+        </div>
+        <h2 class="text-xl font-bold mb-1">AutoCare Management Portal</h2>
+        <p class="text-xs text-muted mb-4">Please sign in using your email account or Google Profile</p>
+
+        <!-- Google Sign-in Button -->
+        <button type="button" class="btn btn-outline full-width btn-google-login mb-4" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.75rem; border-color: #cbd5e1;">
+          <svg class="google-logo-svg" style="width: 18px; height: 18px; margin: 0;" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span style="font-weight: 600;">Sign in with Google</span>
+        </button>
+
+        <div class="flex items-center gap-2 my-3 text-muted text-xs">
+          <hr style="flex: 1; border-top: 1px solid var(--border-color);">
+          <span>OR USE EMAIL</span>
+          <hr style="flex: 1; border-top: 1px solid var(--border-color);">
+        </div>
+
+        <div id="login-form-box">
+          <div id="login-error" class="form-error-box hidden text-left mb-3"></div>
+          <form id="form-email-login" class="text-left">
+            <div class="form-group mb-2">
+              <label class="form-label" for="login-email">Email Address</label>
+              <input type="email" id="login-email" class="input" placeholder="admin@autocare.io" value="admin@autocare.io" required>
+            </div>
+            <div class="form-group mb-3">
+              <label class="form-label" for="login-password">Password</label>
+              <input type="password" id="login-password" class="input" placeholder="••••••••" value="admin123" required>
+            </div>
+            <button type="submit" class="btn btn-primary full-width mb-3" style="width: 100%;">
+              Sign In to Account
+            </button>
+          </form>
+          <div class="text-xs text-muted">
+            Don't have an account? <a href="#" id="toggle-to-register" class="text-brand font-semibold">Register here</a>
+          </div>
+        </div>
+
+        <div id="register-form-box" class="hidden">
+          <div id="register-error" class="form-error-box hidden text-left mb-3"></div>
+          <form id="form-email-register" class="text-left">
+            <div class="form-group mb-2">
+              <label class="form-label" for="reg-name">Full Name</label>
+              <input type="text" id="reg-name" class="input" placeholder="Your Name" required>
+            </div>
+            <div class="form-group mb-2">
+              <label class="form-label" for="reg-email">Email Address</label>
+              <input type="email" id="reg-email" class="input" placeholder="name@example.com" required>
+            </div>
+            <div class="form-group mb-2">
+              <label class="form-label" for="reg-password">Password</label>
+              <input type="password" id="reg-password" class="input" placeholder="Min. 6 characters" required>
+            </div>
+            <div class="form-group mb-3">
+              <label class="form-label" for="reg-confirm-password">Confirm Password</label>
+              <input type="password" id="reg-confirm-password" class="input" placeholder="Re-type password" required>
+            </div>
+            <button type="submit" class="btn btn-primary full-width mb-3" style="width: 100%;">
+              Create New Account
+            </button>
+          </form>
+          <div class="text-xs text-muted">
+            Already have an account? <a href="#" id="toggle-to-login" class="text-brand font-semibold">Sign In</a>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t text-xs text-muted" style="border-top: 1px solid var(--border-color);">
+          Default Demo: <strong>admin@autocare.io</strong> / <strong>admin123</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GOOGLE OAUTH SIMULATOR MODAL -->
+  <div id="modal-google-oauth" class="modal-overlay hidden">
+    <div class="modal-content google-oauth-dialog">
+      <div class="google-dialog-header">
+        <svg class="google-logo-svg" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+        </svg>
+        <h3 class="font-bold">Choose a Google Account</h3>
+        <p class="text-xs text-muted">to continue to AutoCare VMS Application</p>
+      </div>
+      <div id="google-accounts-list"></div>
+      <div class="p-3" style="padding: 1rem 1.25rem;">
+        <details class="text-xs text-muted mb-3">
+          <summary class="cursor-pointer font-semibold text-brand mb-2">+ Or use custom Google account</summary>
+          <form id="form-custom-google" class="mt-2">
+            <input type="text" id="custom-google-name" class="input input-sm mb-2" placeholder="Full Name" required>
+            <input type="email" id="custom-google-email" class="input input-sm mb-2" placeholder="user@gmail.com" required>
+            <button type="submit" class="btn btn-xs btn-primary">Sign in with Custom Google</button>
+          </form>
+        </details>
+        <button id="close-google-modal" class="btn btn-secondary btn-sm full-width" style="width: 100%;">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OWNER PROFILE VIEW MODAL (MEMBER 1) -->
+  <div id="modal-owner-profile" class="modal-overlay owner-modal hidden">
+    <div class="modal-content modal-content-lg">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fas fa-id-card text-brand"></i> Owner Profile & Assets</h3>
+        <button class="modal-close-btn close-owner-modal">&times;</button>
+      </div>
+      <div id="owner-profile-content" class="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- OWNER EDIT MODAL (MEMBER 1) -->
+  <div id="modal-owner-edit" class="modal-overlay owner-modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fas fa-user-edit text-brand"></i> Edit Owner Details</h3>
+        <button class="modal-close-btn close-owner-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="edit-owner-errors" class="form-error-box hidden"></div>
+        <form id="form-owner-edit">
+          <div class="form-group">
+            <label class="form-label" for="edit-owner-id">Owner ID (Immutable)</label>
+            <input type="text" id="edit-owner-id" class="input font-mono" readonly style="background:#f1f5f9;">
+          </div>
+          <div class="form-group">
+            <label class="form-label required" for="edit-owner-name">Full Name</label>
+            <input type="text" id="edit-owner-name" class="input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label required" for="edit-owner-mobile">Mobile Number (10 Digits)</label>
+            <input type="tel" id="edit-owner-mobile" class="input font-mono" maxlength="10" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label required" for="edit-owner-email">Email Address</label>
+            <input type="email" id="edit-owner-email" class="input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label required" for="edit-owner-address">Residential Address</label>
+            <textarea id="edit-owner-address" class="textarea" required></textarea>
+          </div>
+          <div class="flex justify-end gap-2 mt-4">
+            <button type="button" class="btn btn-secondary close-owner-modal">Cancel</button>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Update Profile</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- VEHICLE EDIT MODAL (MEMBER 2) -->
+  <div id="modal-vehicle-edit" class="modal-overlay vehicle-modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fas fa-edit text-brand"></i> Edit Vehicle Details</h3>
+        <button class="modal-close-btn close-vehicle-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="edit-vehicle-errors" class="form-error-box hidden"></div>
+        <form id="form-vehicle-edit">
+          <input type="hidden" id="edit-veh-id">
+          <div class="form-group">
+            <label class="form-label required" for="edit-veh-owner">Assigned Owner</label>
+            <select id="edit-veh-owner" class="select" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label required" for="edit-veh-reg">Registration Number</label>
+            <input type="text" id="edit-veh-reg" class="input font-mono" required>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label required" for="edit-veh-make">Manufacturer</label>
+              <input type="text" id="edit-veh-make" class="input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label required" for="edit-veh-model">Model</label>
+              <input type="text" id="edit-veh-model" class="input" required>
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label required" for="edit-veh-fuel">Fuel Type</label>
+              <select id="edit-veh-fuel" class="select" required>
+                <option value="Petrol">Petrol</option>
+                <option value="Diesel">Diesel</option>
+                <option value="Electric">Electric</option>
+                <option value="Hybrid">Hybrid</option>
+                <option value="CNG">CNG</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label required" for="edit-veh-date">Purchase Date</label>
+              <input type="date" id="edit-veh-date" class="input" required>
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="edit-veh-insurance">Insurance Expiry Date</label>
+              <input type="date" id="edit-veh-insurance" class="input">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="edit-veh-puc">PUC Expiry Date</label>
+              <input type="date" id="edit-veh-puc" class="input">
+            </div>
+          </div>
+          <div class="flex justify-end gap-2 mt-4">
+            <button type="button" class="btn btn-secondary close-vehicle-modal">Cancel</button>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- SERVICE INVOICE / VIEW MODAL (MEMBER 3) -->
+  <div id="modal-service-view" class="modal-overlay service-modal hidden">
+    <div class="modal-content modal-content-lg">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fas fa-file-invoice text-brand"></i> Detailed Maintenance Invoice</h3>
+        <button class="modal-close-btn close-service-modal">&times;</button>
+      </div>
+      <div id="service-view-content" class="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- SERVICE EDIT MODAL (MEMBER 3) -->
+  <div id="modal-service-edit" class="modal-overlay service-modal hidden">
+    <div class="modal-content modal-content-lg">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fas fa-edit text-brand"></i> Edit Service Record</h3>
+        <button class="modal-close-btn close-service-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-service-edit">
+          <input type="hidden" id="edit-srv-id">
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label class="form-label required" for="edit-srv-date">Service Date</label>
+              <input type="date" id="edit-srv-date" class="input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label required" for="edit-srv-center">Workshop Center</label>
+              <input type="text" id="edit-srv-center" class="input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="edit-srv-contact">Contact Phone</label>
+              <input type="text" id="edit-srv-contact" class="input">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label required" for="edit-srv-type">Service Type</label>
+            <select id="edit-srv-type" class="select" required>
+              <option value="Periodic Maintenance">Periodic Maintenance</option>
+              <option value="Brake System">Brake System</option>
+              <option value="Engine & Transmission">Engine & Transmission</option>
+              <option value="EV Diagnostics & Service">EV Diagnostics & Service</option>
+              <option value="Electrical & Battery">Electrical & Battery</option>
+              <option value="Suspension & Steering">Suspension & Steering</option>
+              <option value="Accidental Repair">Accidental Repair</option>
+              <option value="Full Detailing & Wash">Full Detailing & Wash</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label required" for="edit-srv-desc">Description</label>
+            <textarea id="edit-srv-desc" class="textarea" required></textarea>
+          </div>
+
+          <div class="parts-builder-box">
+            <div class="parts-header-bar">
+              <h4 class="font-bold"><i class="fas fa-cogs"></i> Spare Parts Line Items</h4>
+              <button type="button" id="btn-edit-add-spare-part" class="btn btn-xs btn-primary">
+                <i class="fas fa-plus"></i> Add Row
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-compact">
+                <thead>
+                  <tr>
+                    <th>Part Name</th>
+                    <th>Part / SKU #</th>
+                    <th style="width: 80px;">Qty</th>
+                    <th style="width: 110px;">Unit Price (₹)</th>
+                    <th>Subtotal</th>
+                    <th style="width: 40px;"></th>
+                  </tr>
+                </thead>
+                <tbody id="edit-parts-table-body"></tbody>
+              </table>
+            </div>
+            <div class="totals-summary-card">
+              <div class="summary-row">
+                <span>Parts Subtotal:</span>
+                <span id="edit-parts-total" class="font-mono font-bold">₹0</span>
+              </div>
+              <div class="summary-row items-center">
+                <label for="edit-service-labor">Labor (₹):</label>
+                <input type="number" id="edit-service-labor" class="input input-sm font-mono text-right" style="width: 120px;" min="0">
+              </div>
+              <div class="summary-row items-center">
+                <label for="edit-service-tax">Tax (%):</label>
+                <input type="number" id="edit-service-tax" class="input input-sm font-mono text-right" style="width: 120px;" min="0" max="100">
+              </div>
+              <div class="summary-row grand-total-row">
+                <span>Total Service Expense:</span>
+                <span id="edit-service-grand-total" class="font-mono font-bold">₹0</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-2 mt-4">
+            <button type="button" class="btn btn-secondary close-service-modal">Cancel</button>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPOINTMENT BOOKING CONFIRMATION MODAL (MEMBER 4) -->
+  <div id="modal-booking-confirmation" class="modal-overlay appointment-modal hidden">
+    <div class="modal-content" style="max-width: 520px;">
+      <div id="booking-confirmation-content" class="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- APPOINTMENT RESCHEDULE MODAL (MEMBER 4) -->
+  <div id="modal-apt-reschedule" class="modal-overlay appointment-modal hidden">
+    <div class="modal-content" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fas fa-calendar-alt text-brand"></i> Reschedule Appointment</h3>
+        <button class="modal-close-btn close-apt-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-reschedule-submit">
+          <div class="form-group">
+            <label class="form-label required" for="resched-date-input">Select New Date</label>
+            <input type="date" id="resched-date-input" class="input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label required">Select New Time Slot</label>
+            <div id="resched-slots-container" class="slots-grid"></div>
+          </div>
+          <div class="flex justify-end gap-2 mt-4">
+            <button type="button" class="btn btn-secondary close-apt-modal">Cancel</button>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Confirm Reschedule</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPLICATION SCRIPTS -->
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/modules/owners.js"></script>
+  <script src="js/modules/vehicles.js"></script>
+  <script src="js/modules/services.js"></script>
+  <script src="js/modules/appointments.js"></script>
+  <script src="js/modules/dashboard.js"></script>
+  <script src="js/modules/customer.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
-
