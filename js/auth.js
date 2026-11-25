@@ -79,6 +79,10 @@ const Auth = (() => {
       closeGoogleModalBtn.addEventListener('click', closeGoogleOAuthModal);
     }
 
+    // Close Auth Modal / Guest Mode
+    document.getElementById('close-auth-modal')?.addEventListener('click', hideAuthOverlay);
+    document.getElementById('btn-guest-mode')?.addEventListener('click', hideAuthOverlay);
+
     // Custom Google Login Form inside modal
     const customGoogleForm = document.getElementById('form-custom-google');
     if (customGoogleForm) {

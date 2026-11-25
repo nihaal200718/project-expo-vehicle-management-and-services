@@ -241,27 +241,32 @@ const CustomerModule = (() => {
   };
 
   const renderGarageCards = (owner) => {
-    const container = document.getElementById('cust-garage-cards-container');
-    if (!container) return;
+    const containers = [
+      document.getElementById('cust-garage-cards-container'),
+      document.getElementById('cust-garage-cards-container-full')
+    ].filter(Boolean);
+
+    if (containers.length === 0) return;
 
     const vehicles = Store.getVehiclesByOwner(owner.id);
     const services = Store.getServices();
 
     if (vehicles.length === 0) {
-      container.innerHTML = `
+      const emptyHtml = `
         <div class="empty-state" style="grid-column: 1 / -1;">
           <div class="empty-icon"><i class="fas fa-car"></i></div>
           <h3>Your Garage is Empty</h3>
-          <p class="text-muted">You haven't added any vehicles yet. Register your car to schedule services and track maintenance.</p>
+          <p class="text-muted">You have not added any vehicles yet. Register your car to schedule services and track maintenance.</p>
           <button class="btn btn-primary mt-3" onclick="CustomerModule.openAddVehicleModal()">
             <i class="fas fa-plus"></i> Add Vehicle to Garage
           </button>
         </div>
       `;
+      containers.forEach((c) => { c.innerHTML = emptyHtml; });
       return;
     }
 
-    container.innerHTML = vehicles
+    const cardsHtml = vehicles
       .map((v) => {
         const vServices = services.filter((s) => s.vehicleId === v.id || s.vehicleId === v.vehicleId);
         const insStatus = VehicleModule.checkExpiryStatus(v.insuranceExpiry);
@@ -315,6 +320,8 @@ const CustomerModule = (() => {
       `;
       })
       .join('');
+
+    containers.forEach((c) => { c.innerHTML = cardsHtml; });
   };
 
   const renderPackagesGrid = () => {

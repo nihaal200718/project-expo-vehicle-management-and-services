@@ -10,6 +10,8 @@ const OwnerModule = (() => {
     bindEvents();
     renderOwnersList();
     populateOwnerFilter();
+    const idInput = document.getElementById('owner-id-input');
+    if (idInput && !idInput.value) idInput.value = Store.generateId('OWN');
   };
 
   const bindEvents = () => {

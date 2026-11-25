@@ -10,6 +10,8 @@ const VehicleModule = (() => {
     bindEvents();
     renderVehicleList();
     populateVehicleDropdowns();
+    const idInput = document.getElementById('veh-id-input');
+    if (idInput && !idInput.value) idInput.value = Store.generateId('VEH');
   };
 
   const bindEvents = () => {
@@ -463,6 +465,11 @@ const VehicleModule = (() => {
         owners.map((o) => `<option value="${o.id}">${escapeHtml(o.name)}</option>`).join('');
       if (current) ownerFilter.value = current;
     }
+
+    // Also ensure all owner selects (like in vehicle registration form) are populated
+    if (typeof OwnerModule !== 'undefined' && OwnerModule.populateOwnerFilter) {
+      OwnerModule.populateOwnerFilter();
+    }
   };
 
   const escapeHtml = (str) => {
@@ -482,6 +489,8 @@ const VehicleModule = (() => {
     handleDelete,
     closeModals,
     populateVehicleDropdowns,
-    checkExpiryStatus
+    checkExpiryStatus,
+    getFuelBadgeClass,
+    getFuelIcon
   };
 })();

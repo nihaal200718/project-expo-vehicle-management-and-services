@@ -132,6 +132,11 @@
             </button>
           </div>
 
+          <div class="header-greeting ml-3" style="margin-left: 1rem;">
+            <h2 id="portal-header-title" style="font-size: 1.05rem; font-weight: 700;">Customer Vehicle &amp; Service Portal</h2>
+            <p id="portal-header-sub" class="text-xs text-muted" style="display: none;">Manage your personal garage, live booking progress &amp; maintenance</p>
+          </div>
+
           <!-- Customer Persona Switcher -->
           <div id="customer-persona-widget" class="customer-persona-box">
             <span class="text-xs text-muted">Viewing as:</span>
@@ -1138,7 +1143,8 @@
 
   <!-- AUTHENTICATION OVERLAY MODAL -->
   <div id="auth-overlay-modal" class="modal-overlay hidden">
-    <div class="modal-content" style="max-width: 440px;">
+    <div class="modal-content" style="max-width: 440px; position: relative;">
+      <button type="button" id="close-auth-modal" class="modal-close-btn" style="position: absolute; top: 1rem; right: 1rem;" title="Close">&times;</button>
       <div class="modal-body text-center" style="padding: 2rem;">
         <div class="brand-icon-box mx-auto mb-3" style="margin: 0 auto 1rem;">
           <i class="fas fa-car-alt"></i>
@@ -1213,6 +1219,9 @@
 
         <div class="mt-4 pt-3 border-t text-xs text-muted" style="border-top: 1px solid var(--border-color);">
           Default Demo: <strong>admin@autocare.io</strong> / <strong>admin123</strong>
+          <button type="button" id="btn-guest-mode" class="btn btn-secondary btn-xs full-width mt-2" style="width: 100%;">
+            Explore Portal in Demo Mode
+          </button>
         </div>
       </div>
     </div>

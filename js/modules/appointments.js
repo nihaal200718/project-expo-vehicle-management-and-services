@@ -468,6 +468,8 @@ const AppointmentModule = (() => {
     openCancelModal,
     markCompleted,
     handleDelete,
-    closeModals
+    closeModals,
+    showBookingConfirmation,
+    getStatusBadge
   };
 })();

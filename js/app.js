@@ -134,7 +134,6 @@ const App = (() => {
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         document.querySelectorAll('.modal-overlay:not(.hidden)').forEach((m) => {
-          if (m.id === 'auth-overlay-modal' && !Store.getAuthUser()) return;
           m.classList.add('hidden');
           m.classList.remove('flex');
         });
