@@ -405,6 +405,12 @@ const DashboardModule = (() => {
 
   return {
     init,
-    renderAllDashboardComponents
+    renderAllDashboardComponents,
+    renderKPICards,
+    renderRemindersAndAlerts,
+    renderDocumentExpiryTracker,
+    renderExpenseReports,
+    renderExpenseCharts,
+    exportExpenseCSV
   };
 })();

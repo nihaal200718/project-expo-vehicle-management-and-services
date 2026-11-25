@@ -14,7 +14,7 @@ const Store = (() => {
     SERVICES: 'services',
     APPOINTMENTS: 'appointments',
     MAINTENANCE: 'maintenance',
-    SEEDED: 'vms_clean_empty_v5'
+    SEEDED: 'vms_admin_data_v6'
   };
 
   // Helper to read LocalStorage
@@ -75,16 +75,233 @@ const Store = (() => {
     return `${prefix}-${time}${random}`.slice(0, 12);
   };
 
-  // Initial Seed Data: Clean database with zero pre-existing mock records
+  // Seed Data: Admin Portal Operations & Vehicle Fleet Records
   const seedDemoData = (force = false) => {
-    if (!force && localStorage.getItem(KEYS.SEEDED) === 'vms_clean_empty_v5') {
+    if (!force && localStorage.getItem(KEYS.SEEDED) === 'vms_admin_data_v6') {
       return;
     }
 
-    const owners = [];
-    const vehicles = [];
-    const services = [];
-    const appointments = [];
+    const today = new Date();
+    const formatDate = (daysOffset) => {
+      const d = new Date(today);
+      d.setDate(d.getDate() + daysOffset);
+      return d.toISOString().split('T')[0];
+    };
+
+    const owners = [
+      {
+        id: 'OWN-101',
+        ownerId: 'OWN-101',
+        name: 'Aarav Sharma',
+        ownerName: 'Aarav Sharma',
+        mobile: '9876543210',
+        email: 'aarav.sharma@example.com',
+        address: '42, Greenwood Avenue, Sector 14, Gurugram, Haryana',
+        createdDate: formatDate(-120)
+      },
+      {
+        id: 'OWN-102',
+        ownerId: 'OWN-102',
+        name: 'Pooja Hegde',
+        ownerName: 'Pooja Hegde',
+        mobile: '9845123456',
+        email: 'pooja.hegde@example.com',
+        address: 'Flat 302, Palm Heights, Koramangala 4th Block, Bengaluru',
+        createdDate: formatDate(-80)
+      },
+      {
+        id: 'OWN-103',
+        ownerId: 'OWN-103',
+        name: 'Vikramaditya Verma',
+        ownerName: 'Vikramaditya Verma',
+        mobile: '9712398450',
+        email: 'vikram.verma@example.com',
+        address: '15/B, Bandra West, Mumbai, Maharashtra',
+        createdDate: formatDate(-45)
+      }
+    ];
+
+    const vehicles = [
+      {
+        id: 'VEH-201',
+        vehicleId: 'VEH-201',
+        regNumber: 'KA 01 MG 8945',
+        registrationNumber: 'KA 01 MG 8945',
+        make: 'Tata Motors',
+        manufacturer: 'Tata Motors',
+        model: 'Nexon EV Empowered',
+        fuelType: 'Electric',
+        purchaseDate: formatDate(-400),
+        insuranceExpiry: formatDate(25), // Expiring in 25 days (Warning)
+        pucExpiry: formatDate(180), // Valid
+        ownerId: 'OWN-102',
+        ownerName: 'Pooja Hegde'
+      },
+      {
+        id: 'VEH-202',
+        vehicleId: 'VEH-202',
+        regNumber: 'DL 03 CB 4120',
+        registrationNumber: 'DL 03 CB 4120',
+        make: 'Hyundai',
+        manufacturer: 'Hyundai',
+        model: 'Creta SX (O)',
+        fuelType: 'Petrol',
+        purchaseDate: formatDate(-720),
+        insuranceExpiry: formatDate(-5), // Expired 5 days ago (Critical)
+        pucExpiry: formatDate(6), // Expiring in 6 days (Critical)
+        ownerId: 'OWN-101',
+        ownerName: 'Aarav Sharma'
+      },
+      {
+        id: 'VEH-203',
+        vehicleId: 'VEH-203',
+        regNumber: 'MH 02 FP 9033',
+        registrationNumber: 'MH 02 FP 9033',
+        make: 'Toyota',
+        manufacturer: 'Toyota',
+        model: 'Innova Hycross ZX',
+        fuelType: 'Hybrid',
+        purchaseDate: formatDate(-250),
+        insuranceExpiry: formatDate(190), // Valid
+        pucExpiry: formatDate(40), // Expiring in 40 days
+        ownerId: 'OWN-103',
+        ownerName: 'Vikramaditya Verma'
+      },
+      {
+        id: 'VEH-204',
+        vehicleId: 'VEH-204',
+        regNumber: 'DL 08 EF 6721',
+        registrationNumber: 'DL 08 EF 6721',
+        make: 'Mahindra',
+        manufacturer: 'Mahindra',
+        model: 'XUV700 AX7L',
+        fuelType: 'Diesel',
+        purchaseDate: formatDate(-520),
+        insuranceExpiry: formatDate(85), // Valid
+        pucExpiry: formatDate(-12), // Expired 12 days ago (Critical)
+        ownerId: 'OWN-101',
+        ownerName: 'Aarav Sharma'
+      }
+    ];
+
+    const services = [
+      {
+        id: 'SRV-301',
+        serviceId: 'SRV-301',
+        vehicleId: 'VEH-202',
+        ownerId: 'OWN-101',
+        ownerName: 'Aarav Sharma',
+        serviceDate: formatDate(-30),
+        serviceCenter: 'Apex Hyundai Authorized Hub, Okhla',
+        serviceCenterContact: '+91 11 4509 8812',
+        serviceDescription: 'Periodic 20,000 KM Maintenance, Wheel Alignment, Synthetic Engine Oil replacement',
+        description: 'Periodic 20,000 KM Maintenance, Wheel Alignment, Synthetic Engine Oil replacement',
+        serviceType: 'Periodic Maintenance',
+        parts: [
+          { name: 'Fully Synthetic 5W-30 Engine Oil (3.8L)', partName: 'Fully Synthetic 5W-30 Engine Oil (3.8L)', partNumber: 'HY-OIL-5W30', quantity: 1, unitPrice: 3200, unitCost: 3200, total: 3200 },
+          { name: 'OEM Oil Filter Cartridge', partName: 'OEM Oil Filter Cartridge', partNumber: 'HY-FILT-26300', quantity: 1, unitPrice: 480, unitCost: 480, total: 480 },
+          { name: 'Cabin Air Purifier Filter', partName: 'Cabin Air Purifier Filter', partNumber: 'HY-CAB-97133', quantity: 1, unitPrice: 850, unitCost: 850, total: 850 }
+        ],
+        laborCost: 1800,
+        labourCost: 1800,
+        taxPercent: 18,
+        totalExpenses: 7469,
+        totalCost: 7469
+      },
+      {
+        id: 'SRV-302',
+        serviceId: 'SRV-302',
+        vehicleId: 'VEH-204',
+        ownerId: 'OWN-101',
+        ownerName: 'Aarav Sharma',
+        serviceDate: formatDate(-75),
+        serviceCenter: 'Mahindra Star Care, Sector 63',
+        serviceCenterContact: '+91 120 499 2300',
+        serviceDescription: 'Front Brake Disc Pads Replacement and Suspension Greasing',
+        description: 'Front Brake Disc Pads Replacement and Suspension Greasing',
+        serviceType: 'Brake System',
+        parts: [
+          { name: 'Ceramic Front Brake Pad Set', partName: 'Ceramic Front Brake Pad Set', partNumber: 'MHD-BRK-4001', quantity: 1, unitPrice: 4200, unitCost: 4200, total: 4200 },
+          { name: 'Brake Fluid DOT 4 (500ml)', partName: 'Brake Fluid DOT 4 (500ml)', partNumber: 'MHD-DOT4-500', quantity: 2, unitPrice: 350, unitCost: 350, total: 700 }
+        ],
+        laborCost: 1400,
+        labourCost: 1400,
+        taxPercent: 18,
+        totalExpenses: 7434,
+        totalCost: 7434
+      },
+      {
+        id: 'SRV-303',
+        serviceId: 'SRV-303',
+        vehicleId: 'VEH-201',
+        ownerId: 'OWN-102',
+        ownerName: 'Pooja Hegde',
+        serviceDate: formatDate(-15),
+        serviceCenter: 'Tata Motors EV Tech Center, Whitefield',
+        serviceCenterContact: '+91 80 6710 4400',
+        serviceDescription: 'Annual EV Health Checkup, Battery Pack Coolant flush, Software firmware update v4.2',
+        description: 'Annual EV Health Checkup, Battery Pack Coolant flush, Software firmware update v4.2',
+        serviceType: 'EV Diagnostics & Service',
+        parts: [
+          { name: 'Battery Coolant Special Liquid (5L)', partName: 'Battery Coolant Special Liquid (5L)', partNumber: 'TT-COOL-EV40', quantity: 1, unitPrice: 2400, unitCost: 2400, total: 2400 },
+          { name: 'Wiper Blade Aerodynamic Pair', partName: 'Wiper Blade Aerodynamic Pair', partNumber: 'TT-WIP-2418', quantity: 1, unitPrice: 950, unitCost: 950, total: 950 }
+        ],
+        laborCost: 1200,
+        labourCost: 1200,
+        taxPercent: 18,
+        totalExpenses: 5369,
+        totalCost: 5369
+      }
+    ];
+
+    const appointments = [
+      {
+        id: 'APT-401',
+        appointmentId: 'APT-401',
+        vehicleId: 'VEH-201',
+        ownerId: 'OWN-102',
+        ownerName: 'Pooja Hegde',
+        serviceType: 'Tire Rotation & Balance',
+        date: formatDate(3),
+        appointmentDate: formatDate(3),
+        timeSlot: '10:00 AM',
+        notes: 'Slight vibration above 90 km/h on highway, check wheel weights.',
+        description: 'Slight vibration above 90 km/h on highway, check wheel weights.',
+        status: 'Confirmed',
+        createdAt: formatDate(-1)
+      },
+      {
+        id: 'APT-402',
+        appointmentId: 'APT-402',
+        vehicleId: 'VEH-202',
+        ownerId: 'OWN-101',
+        ownerName: 'Aarav Sharma',
+        serviceType: 'Oil Change',
+        date: formatDate(5),
+        appointmentDate: formatDate(5),
+        timeSlot: '02:00 PM',
+        notes: 'AC cooling sluggish during daytime, needs gas check.',
+        description: 'AC cooling sluggish during daytime, needs gas check.',
+        status: 'Pending',
+        createdAt: formatDate(-2)
+      },
+      {
+        id: 'APT-403',
+        appointmentId: 'APT-403',
+        vehicleId: 'VEH-203',
+        ownerId: 'OWN-103',
+        ownerName: 'Vikramaditya Verma',
+        serviceType: 'General Service',
+        date: formatDate(8),
+        appointmentDate: formatDate(8),
+        timeSlot: '09:00 AM',
+        notes: 'Pre-roadtrip monsoon inspection and wiper test.',
+        description: 'Pre-roadtrip monsoon inspection and wiper test.',
+        status: 'Rescheduled',
+        createdAt: formatDate(-5)
+      }
+    ];
+
     const users = [
       {
         id: 'USR-01',
@@ -102,7 +319,7 @@ const Store = (() => {
     set(KEYS.SERVICES, services);
     set(KEYS.APPOINTMENTS, appointments);
     set(KEYS.USERS, users);
-    localStorage.setItem(KEYS.SEEDED, 'vms_clean_empty_v5');
+    localStorage.setItem(KEYS.SEEDED, 'vms_admin_data_v6');
   };
 
   // --- MEMBER 1: OWNER OPERATIONS ---

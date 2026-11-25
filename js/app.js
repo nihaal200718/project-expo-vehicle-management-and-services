@@ -148,6 +148,7 @@ const App = (() => {
       closeMobileSidebar();
       return;
     } else {
+      document.getElementById('customer-views-wrapper')?.classList.add('hidden');
       document.getElementById('admin-views-wrapper')?.classList.remove('hidden');
     }
 
@@ -174,6 +175,9 @@ const App = (() => {
     } else if (tabName === 'appointments') {
       AppointmentModule.renderAppointmentsList();
       VehicleModule.populateVehicleDropdowns();
+    } else if (tabName === 'reports') {
+      DashboardModule.renderExpenseReports();
+      DashboardModule.renderExpenseCharts();
     }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });

@@ -69,11 +69,12 @@ const CustomerModule = (() => {
       if (match) {
         activeCustomerOwnerId = match.id;
       } else if (owners.length > 0) {
-        // If not matched, default to first owner or retain current
         if (!owners.some((o) => o.id === activeCustomerOwnerId)) {
           activeCustomerOwnerId = owners[0].id;
         }
       }
+    } else if (owners.length > 0 && !activeCustomerOwnerId) {
+      activeCustomerOwnerId = owners[0].id;
     }
   };
 
