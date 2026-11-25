@@ -39,7 +39,7 @@ const App = (() => {
 
     if (savedRole === 'admin') {
       setPortalMode('admin');
-      if (['owners', 'vehicles', 'services', 'appointments', 'reports', 'dashboard'].includes(hash)) {
+      if (['owners', 'vehicles', 'services', 'appointments', 'reports', 'dashboard', 'centers'].includes(hash)) {
         navigateTo(hash);
       }
     } else {
@@ -138,6 +138,19 @@ const App = (() => {
     });
 
     // Update View Containers
+    if (tabName === 'centers') {
+      document.querySelectorAll('#admin-views-wrapper .tab-view-container').forEach((view) => {
+        view.classList.add('hidden');
+      });
+      document.getElementById('customer-views-wrapper')?.classList.remove('hidden');
+      CustomerModule.showCustomerView('centers');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      closeMobileSidebar();
+      return;
+    } else {
+      document.getElementById('admin-views-wrapper')?.classList.remove('hidden');
+    }
+
     document.querySelectorAll('#admin-views-wrapper .tab-view-container').forEach((view) => {
       if (view.id === `view-${tabName}`) {
         view.classList.remove('hidden');
