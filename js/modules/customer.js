@@ -5,7 +5,7 @@
  */
 
 const CustomerModule = (() => {
-  let activeCustomerOwnerId = 'OWN-101'; // Default demo customer: Aarav Sharma
+  let activeCustomerOwnerId = null;
   let selectedPackage = 'Comprehensive Periodic Service';
   let selectedSlot = '10:00 AM';
 
@@ -159,15 +159,74 @@ const CustomerModule = (() => {
 
   const renderCustomerPortal = () => {
     const owner = getCurrentOwner();
-    if (!owner) return;
-
-    // Update Persona Selector
     const personaSelect = document.getElementById('customer-persona-select');
     const owners = Store.getOwners();
+
     if (personaSelect) {
-      personaSelect.innerHTML = owners
-        .map((o) => `<option value="${o.id}" ${o.id === activeCustomerOwnerId ? 'selected' : ''}>${escapeHtml(o.name)} (${o.id})</option>`)
-        .join('');
+      if (owners.length > 0) {
+        personaSelect.innerHTML = owners
+          .map((o) => `<option value="${o.id}" ${o.id === activeCustomerOwnerId ? 'selected' : ''}>${escapeHtml(o.name)} (${o.id})</option>`)
+          .join('');
+      } else {
+        personaSelect.innerHTML = '<option value="">No Registered Owners</option>';
+      }
+    }
+
+    if (!owner) {
+      const welcomeNameEl = document.getElementById('cust-welcome-name');
+      if (welcomeNameEl) welcomeNameEl.textContent = 'Valued Customer';
+      setText('cust-kpi-vehicles', 0);
+      setText('cust-kpi-active-bookings', 0);
+      setText('cust-kpi-services-done', 0);
+      setText('cust-kpi-total-invested', '₹0');
+
+      const containers = [
+        document.getElementById('cust-garage-cards-container'),
+        document.getElementById('cust-garage-cards-container-full')
+      ].filter(Boolean);
+      containers.forEach((c) => {
+        c.innerHTML = `
+          <div class="empty-state" style="grid-column: 1 / -1;">
+            <div class="empty-icon"><i class="fas fa-car"></i></div>
+            <h3>Your Garage is Empty</h3>
+            <p class="text-muted">You have not added any vehicles yet. Register your vehicle to schedule services and track maintenance.</p>
+            <button class="btn btn-primary mt-3" onclick="CustomerModule.openAddVehicleModal()">
+              <i class="fas fa-plus"></i> Add Vehicle
+            </button>
+          </div>
+        `;
+      });
+
+      const aptListContainer = document.getElementById('cust-appointments-list-container');
+      if (aptListContainer) {
+        aptListContainer.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-calendar-alt"></i></div>
+            <h3>No Active Bookings</h3>
+            <p class="text-muted">You have not scheduled any service appointments yet.</p>
+            <button class="btn btn-primary mt-3" onclick="CustomerModule.showCustomerView('book')">
+              <i class="fas fa-calendar-plus"></i> Book a Service
+            </button>
+          </div>
+        `;
+      }
+
+      const invContainer = document.getElementById('cust-invoices-list-container');
+      if (invContainer) {
+        invContainer.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-file-invoice"></i></div>
+            <h3>No Service Invoices</h3>
+            <p class="text-muted">Invoices will appear here once your service appointments are completed.</p>
+          </div>
+        `;
+      }
+
+      renderPackagesGrid();
+      renderCustomerVehicleDropdowns(null);
+      renderCustomerTimeSlots();
+      updateCostEstimate();
+      return;
     }
 
     // Update Welcome Title
