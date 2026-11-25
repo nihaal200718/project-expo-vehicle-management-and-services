@@ -396,6 +396,8 @@ const CustomerModule = (() => {
 
     const vehId = document.getElementById('cust-book-vehicle-select').value;
     const date = document.getElementById('cust-book-date').value;
+    const centerSelect = document.getElementById('cust-book-center-select');
+    const centerVal = centerSelect ? centerSelect.value : '';
     const notes = document.getElementById('cust-book-notes').value.trim();
 
     if (!vehId) {
@@ -412,13 +414,19 @@ const CustomerModule = (() => {
     }
 
     try {
+      const combinedNotes = [
+        centerVal ? `Center: ${centerVal}` : '',
+        notes ? `[Customer Request] ${notes}` : 'Booked via Customer Portal'
+      ].filter(Boolean).join(' | ');
+
       const newApt = Store.addAppointment({
         vehicleId: vehId,
         ownerId: owner.id,
         serviceType: selectedPackage,
+        serviceCenter: centerVal || 'AutoCare Tech City Supercenter',
         date,
         timeSlot: selectedSlot,
-        notes: notes ? `[Customer Request] ${notes}` : 'Booked via Customer Portal'
+        notes: combinedNotes
       });
 
       AppointmentModule.showBookingConfirmation(newApt);

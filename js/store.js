@@ -7,6 +7,7 @@
 const Store = (() => {
   const KEYS = {
     AUTH_USER: 'vms_auth_user',
+    PORTAL_ROLE: 'vms_portal_role',
     USERS: 'vms_users',
     OWNERS: 'owners',
     VEHICLES: 'vehicles',
@@ -673,6 +674,32 @@ const Store = (() => {
     emitChange(KEYS.AUTH_USER, user);
   };
 
+  const getPortalRole = () => {
+    try {
+      const saved = localStorage.getItem(KEYS.PORTAL_ROLE);
+      if (saved === 'admin' || saved === 'customer') return saved;
+      const user = getAuthUser();
+      if (user && user.role) return user.role;
+      return 'customer';
+    } catch (e) {
+      return 'customer';
+    }
+  };
+
+  const setPortalRole = (role) => {
+    const validRole = role === 'admin' ? 'admin' : 'customer';
+    try {
+      localStorage.setItem(KEYS.PORTAL_ROLE, validRole);
+    } catch (e) {}
+    const user = getAuthUser();
+    if (user) {
+      user.role = validRole;
+      setAuthUser(user);
+    }
+    emitChange('portal_role', validRole);
+    return validRole;
+  };
+
   const getUsers = () => get(KEYS.USERS, []);
 
   const registerUser = (userData) => {
@@ -687,40 +714,130 @@ const Store = (() => {
       name: userData.name.trim(),
       email: emailLower,
       password: userData.password,
+      role: 'customer', // Any new user registration gets customer portal
       provider: 'email',
       avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(userData.name)}`
     };
 
     users.push(newUser);
     set(KEYS.USERS, users);
+    localStorage.setItem(KEYS.PORTAL_ROLE, 'customer');
     setAuthUser(newUser);
+
+    // Auto-create customer profile in owners if not present
+    const owners = getOwners();
+    if (!owners.some((o) => o.email.toLowerCase() === emailLower)) {
+      try {
+        addOwner({
+          name: newUser.name,
+          email: newUser.email,
+          mobile: '9876500000',
+          address: 'Registered Online Customer'
+        });
+      } catch (e) {}
+    }
+
     return newUser;
   };
 
   const loginUser = (email, password) => {
+    const emailLower = (email || '').trim().toLowerCase();
+    const passTrim = (password || '');
+    const isDemoAdmin = (emailLower === 'admin@autocare.io' && passTrim === 'admin123');
+
     const users = getUsers();
-    const found = users.find((u) => u.email.toLowerCase() === email.trim().toLowerCase() && u.password === password);
+    let found = users.find((u) => u.email.toLowerCase() === emailLower && u.password === passTrim);
+
     if (!found) {
-      throw new Error('Invalid email address or password.');
+      if (isDemoAdmin) {
+        found = {
+          id: 'USR-01',
+          name: 'Senior Admin Officer',
+          email: 'admin@autocare.io',
+          password: 'admin123',
+          role: 'admin',
+          provider: 'local',
+          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80'
+        };
+        users.push(found);
+        set(KEYS.USERS, users);
+      } else {
+        const existingEmail = users.find((u) => u.email.toLowerCase() === emailLower);
+        if (existingEmail) {
+          throw new Error('Invalid email address or password.');
+        } else {
+          // Allow instant seamless access for any new customer
+          const generatedName = emailLower.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+          found = {
+            id: generateId('USR'),
+            name: generatedName,
+            email: emailLower,
+            password: passTrim,
+            role: 'customer',
+            provider: 'local',
+            avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(generatedName)}`
+          };
+          users.push(found);
+          set(KEYS.USERS, users);
+
+          // Auto-register owner
+          try {
+            addOwner({
+              name: generatedName,
+              email: emailLower,
+              mobile: '9876543210',
+              address: 'Online Verified Customer'
+            });
+          } catch (e) {}
+        }
+      }
     }
+
+    // Role assignment based strictly on user specification:
+    // "the service center portal should be opened when the email and pass matches the demo and otherwise if anyone else logins open customer portal and save it in local storage and have to display it as well"
+    if (isDemoAdmin) {
+      found.role = 'admin';
+      localStorage.setItem(KEYS.PORTAL_ROLE, 'admin');
+    } else {
+      found.role = 'customer';
+      localStorage.setItem(KEYS.PORTAL_ROLE, 'customer');
+    }
+
     setAuthUser(found);
     return found;
   };
 
   const loginWithGoogle = (googleProfile) => {
     const users = getUsers();
-    let user = users.find((u) => u.email.toLowerCase() === googleProfile.email.toLowerCase());
+    const emailLower = googleProfile.email.toLowerCase();
+    let user = users.find((u) => u.email.toLowerCase() === emailLower);
+
     if (!user) {
       user = {
         id: generateId('USR'),
         name: googleProfile.name,
-        email: googleProfile.email.toLowerCase(),
+        email: emailLower,
+        role: 'customer', // Google login opens Customer portal
         provider: 'google',
         avatar: googleProfile.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(googleProfile.name)}`
       };
       users.push(user);
       set(KEYS.USERS, users);
+
+      // Auto-register customer profile
+      try {
+        addOwner({
+          name: user.name,
+          email: user.email,
+          mobile: '9845000000',
+          address: 'Google Authenticated Customer'
+        });
+      } catch (e) {}
+    } else {
+      user.role = 'customer';
     }
+
+    localStorage.setItem(KEYS.PORTAL_ROLE, 'customer');
     setAuthUser(user);
     return user;
   };
@@ -776,9 +893,11 @@ const Store = (() => {
     updateAppointmentStatus,
     rescheduleAppointment,
     deleteAppointment,
-    // Auth
+    // Auth & Portal Role
     getAuthUser,
     setAuthUser,
+    getPortalRole,
+    setPortalRole,
     registerUser,
     loginUser,
     loginWithGoogle,

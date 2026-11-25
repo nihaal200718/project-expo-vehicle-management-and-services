@@ -107,9 +107,15 @@ const Auth = (() => {
 
     try {
       const user = Store.loginUser(email, password);
-      App.showToast(`Welcome back, ${user.name}!`, 'success');
       hideAuthOverlay();
       renderUserUI();
+      if (user.role === 'admin') {
+        App.setPortalMode('admin');
+        App.showToast(`Logged into Service Center Operations as ${user.name}!`, 'success');
+      } else {
+        App.setPortalMode('customer');
+        App.showToast(`Welcome back, ${user.name}! Opened Customer Portal.`, 'success');
+      }
     } catch (err) {
       showAuthError('login-error', err.message);
     }
@@ -142,9 +148,10 @@ const Auth = (() => {
 
     try {
       const user = Store.registerUser({ name, email, password });
-      App.showToast(`Account created! Welcome, ${user.name}.`, 'success');
       hideAuthOverlay();
       renderUserUI();
+      App.setPortalMode('customer');
+      App.showToast(`Account created! Welcome, ${user.name}. Customer Portal activated.`, 'success');
     } catch (err) {
       showAuthError('register-error', err.message);
     }
@@ -195,9 +202,10 @@ const Auth = (() => {
   const selectGoogleAccount = (profile) => {
     closeGoogleOAuthModal();
     const user = Store.loginWithGoogle(profile);
-    App.showToast(`Signed in with Google as ${user.name}`, 'success');
     hideAuthOverlay();
     renderUserUI();
+    App.setPortalMode('customer');
+    App.showToast(`Signed in with Google as ${user.name}! Customer Portal opened.`, 'success');
   };
 
   const handleCustomGoogleSubmit = (e) => {
@@ -244,19 +252,42 @@ const Auth = (() => {
 
   const renderUserUI = () => {
     const user = Store.getAuthUser();
-    const userProfileEl = document.getElementById('user-profile-display');
     const userAvatarEl = document.getElementById('user-header-avatar');
     const userNameEl = document.getElementById('user-header-name');
     const userEmailEl = document.getElementById('user-header-email');
     const userBadgeEl = document.getElementById('user-provider-badge');
+    const portalBadgeEl = document.getElementById('active-portal-badge');
+
+    const role = Store.getPortalRole() || (user ? user.role : 'customer') || 'customer';
+
+    // Update active portal indicator in header
+    if (portalBadgeEl) {
+      if (role === 'admin') {
+        portalBadgeEl.innerHTML = `
+          <span class="portal-badge-chip badge-admin">
+            <i class="fas fa-tools"></i>
+            <span>Service Center Portal</span>
+            <span class="role-tag">Admin</span>
+          </span>
+        `;
+      } else {
+        portalBadgeEl.innerHTML = `
+          <span class="portal-badge-chip badge-customer">
+            <i class="fas fa-user-circle"></i>
+            <span>Customer Portal</span>
+            <span class="role-tag">Customer</span>
+          </span>
+        `;
+      }
+    }
 
     if (user) {
       if (userNameEl) userNameEl.textContent = user.name;
       if (userEmailEl) userEmailEl.textContent = user.email;
       if (userAvatarEl) userAvatarEl.src = user.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.name)}`;
       if (userBadgeEl) {
-        userBadgeEl.textContent = user.provider === 'google' ? 'Google' : 'Email';
-        userBadgeEl.className = `badge ${user.provider === 'google' ? 'badge-google' : 'badge-primary'}`;
+        userBadgeEl.textContent = user.role === 'admin' ? 'Admin Officer' : (user.provider === 'google' ? 'Google Customer' : 'Customer Account');
+        userBadgeEl.className = `badge ${user.role === 'admin' ? 'badge-danger' : (user.provider === 'google' ? 'badge-google' : 'badge-primary')}`;
       }
       hideAuthOverlay();
     } else {

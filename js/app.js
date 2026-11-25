@@ -21,51 +21,41 @@ const App = (() => {
     // Initialize Customer/User Portal Module
     CustomerModule.init();
 
+    // Initialize Nearest Service Centers & Google Maps Module
+    if (typeof MapsModule !== 'undefined') {
+      MapsModule.init();
+    }
+
     bindNavEvents();
-    bindPortalModeSwitch();
     setupMobileSidebar();
 
-    // Check URL Hash routing (e.g. #admin, #customer, #owners, #vehicles)
+    // Check LocalStorage saved role & URL Hash routing
     handleInitialRoute();
   };
 
   const handleInitialRoute = () => {
+    const savedRole = Store.getPortalRole ? Store.getPortalRole() : (localStorage.getItem('vms_portal_role') || 'customer');
     const hash = window.location.hash.replace('#', '').toLowerCase();
-    if (['owners', 'vehicles', 'services', 'appointments', 'reports', 'dashboard', 'admin'].includes(hash)) {
+
+    if (savedRole === 'admin') {
       setPortalMode('admin');
-      if (hash !== 'admin') {
+      if (['owners', 'vehicles', 'services', 'appointments', 'reports', 'dashboard'].includes(hash)) {
         navigateTo(hash);
       }
     } else {
       setPortalMode('customer');
-      if (['garage', 'book', 'bookings', 'invoices', 'estimator', 'profile'].includes(hash)) {
+      if (['garage', 'book', 'bookings', 'invoices', 'estimator', 'profile', 'centers'].includes(hash)) {
         CustomerModule.showCustomerView(hash);
       }
     }
   };
 
-  const bindPortalModeSwitch = () => {
-    const btnCustomer = document.getElementById('btn-mode-customer');
-    const btnAdmin = document.getElementById('btn-mode-admin');
-
-    if (btnCustomer) {
-      btnCustomer.addEventListener('click', () => {
-        setPortalMode('customer');
-      });
-    }
-
-    if (btnAdmin) {
-      btnAdmin.addEventListener('click', () => {
-        setPortalMode('admin');
-      });
-    }
-  };
-
   const setPortalMode = (mode) => {
     activePortalMode = mode;
+    try {
+      localStorage.setItem('vms_portal_role', mode);
+    } catch (e) {}
 
-    const btnCustomer = document.getElementById('btn-mode-customer');
-    const btnAdmin = document.getElementById('btn-mode-admin');
     const adminSidebar = document.getElementById('sidebar-nav-admin');
     const customerSidebar = document.getElementById('sidebar-nav-customer');
     const adminViews = document.getElementById('admin-views-wrapper');
@@ -73,11 +63,30 @@ const App = (() => {
     const headerTitle = document.getElementById('portal-header-title');
     const headerSub = document.getElementById('portal-header-sub');
     const personaWidget = document.getElementById('customer-persona-widget');
+    const portalBadgeEl = document.getElementById('active-portal-badge');
+
+    // Update the portal indicator display in header
+    if (portalBadgeEl) {
+      if (mode === 'admin') {
+        portalBadgeEl.innerHTML = `
+          <span class="portal-badge-chip badge-admin">
+            <i class="fas fa-tools"></i>
+            <span>Service Center Portal</span>
+            <span class="role-tag">Admin</span>
+          </span>
+        `;
+      } else {
+        portalBadgeEl.innerHTML = `
+          <span class="portal-badge-chip badge-customer">
+            <i class="fas fa-user-circle"></i>
+            <span>Customer Portal</span>
+            <span class="role-tag">Customer</span>
+          </span>
+        `;
+      }
+    }
 
     if (mode === 'customer') {
-      btnCustomer?.classList.add('active');
-      btnAdmin?.classList.remove('active');
-
       adminSidebar?.classList.add('hidden');
       customerSidebar?.classList.remove('hidden');
 
@@ -87,13 +96,10 @@ const App = (() => {
       personaWidget?.classList.remove('hidden');
 
       if (headerTitle) headerTitle.textContent = 'Customer Vehicle & Service Portal';
-      if (headerSub) headerSub.textContent = 'Manage your personal garage, live booking progress, maintenance bills & roadside help';
+      if (headerSub) headerSub.textContent = 'Manage your personal garage, live booking progress, nearest service centers & roadside help';
 
       CustomerModule.renderCustomerPortal();
     } else {
-      btnAdmin?.classList.add('active');
-      btnCustomer?.classList.remove('active');
-
       customerSidebar?.classList.add('hidden');
       adminSidebar?.classList.remove('hidden');
 

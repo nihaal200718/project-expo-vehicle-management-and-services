@@ -53,6 +53,11 @@
           <i class="fas fa-file-invoice"></i>
           <span>Service Bills & History</span>
         </a>
+        <a class="nav-link customer-nav-link" data-cust-view="centers">
+          <i class="fas fa-map-marked-alt"></i>
+          <span>Nearest Centers</span>
+          <span class="badge badge-success text-xs">Live Map</span>
+        </a>
 
         <span class="nav-section-label mt-4">Tools & Assistance</span>
         <a class="nav-link customer-nav-link" data-cust-view="estimator">
@@ -122,14 +127,13 @@
             <i class="fas fa-bars"></i>
           </button>
 
-          <!-- Portal Mode Switcher (User Side vs Service Center Side) -->
-          <div class="portal-mode-toggle">
-            <button type="button" class="btn-mode active" id="btn-mode-customer">
-              <i class="fas fa-user-circle"></i> Customer Portal
-            </button>
-            <button type="button" class="btn-mode" id="btn-mode-admin">
-              <i class="fas fa-tools"></i> Service Center Portal
-            </button>
+          <!-- Active Portal & Role Indicator (Persisted in LocalStorage) -->
+          <div id="active-portal-badge" class="active-portal-badge">
+            <span class="portal-badge-chip badge-customer">
+              <i class="fas fa-user-circle"></i>
+              <span>Customer Portal</span>
+              <span class="role-tag">Customer</span>
+            </span>
           </div>
 
           <div class="header-greeting ml-3" style="margin-left: 1rem;">
@@ -178,6 +182,9 @@
                 <p>Welcome to your personal vehicle maintenance dashboard. Monitor your fleet health, upcoming bookings, and service documents.</p>
               </div>
               <div class="flex gap-2">
+                <button class="btn btn-outline btn-sm" onclick="CustomerModule.showCustomerView('centers')">
+                  <i class="fas fa-map-marked-alt text-brand"></i> Nearest Centers
+                </button>
                 <button class="btn btn-primary btn-sm" onclick="CustomerModule.showCustomerView('book')">
                   <i class="fas fa-calendar-plus"></i> Book Service
                 </button>
@@ -329,6 +336,27 @@
                   <div id="cust-time-slots-container" class="slots-grid">
                     <!-- Dynamic chips -->
                   </div>
+                </div>
+
+                <div class="form-group">
+                  <div class="flex justify-between items-center mb-1">
+                    <label class="form-label required" for="cust-book-center-select">Select Service Center Workshop</label>
+                    <button type="button" class="btn btn-xs btn-outline" onclick="CustomerModule.showCustomerView('centers')">
+                      <i class="fas fa-map-marked-alt text-brand"></i> Find Nearest on Map
+                    </button>
+                  </div>
+                  <select id="cust-book-center-select" class="select" required>
+                    <option value="AutoCare Tech City Supercenter - HITEC City">AutoCare Tech City Supercenter - HITEC City, Hyderabad</option>
+                    <option value="AutoCare Deccan Prime Workshop - Banjara Hills">AutoCare Deccan Prime Workshop - Banjara Hills, Hyderabad</option>
+                    <option value="AutoCare Mega Hub & EV Express - Okhla Ph 3">AutoCare Mega Hub & EV Express - Okhla Ph 3, New Delhi</option>
+                    <option value="AutoCare Cyber City Express Hub - DLF Ph 2">AutoCare Cyber City Express Hub - Gurugram</option>
+                    <option value="AutoCare GreenTech & EV Hub - Koramangala">AutoCare GreenTech & EV Hub - Koramangala, Bengaluru</option>
+                    <option value="AutoCare Whitefield Tech Facility">AutoCare Whitefield Tech Facility - Whitefield, Bengaluru</option>
+                    <option value="AutoCare Coastal Works & Detailing - Bandra">AutoCare Coastal Works & Detailing - Bandra, Mumbai</option>
+                    <option value="AutoCare Sector 62 Facility - Noida">AutoCare Sector 62 Facility - Sector 62, Noida</option>
+                    <option value="AutoCare Deccan Tech Hub - Hinjewadi">AutoCare Deccan Tech Hub - Hinjewadi, Pune</option>
+                    <option value="AutoCare Marina Hub - Guindy">AutoCare Marina Hub - Guindy, Chennai</option>
+                  </select>
                 </div>
 
                 <div class="form-group">
@@ -539,6 +567,103 @@
                   <i class="fas fa-save"></i> Save Profile Details
                 </button>
               </form>
+            </div>
+          </section>
+
+          <!-- 7. NEAREST SERVICE CENTERS & GOOGLE MAPS LOCATOR SUBVIEW -->
+          <section id="cust-view-centers" class="customer-subview hidden">
+            <div class="section-header-bar">
+              <div>
+                <h1>Nearest Service Centers &amp; Google Maps Locator</h1>
+                <p>Locate authorized AutoCare workshops nearby using live Google Maps. Calculate real-time distances, review center amenities, and book instant service.</p>
+              </div>
+              <div class="flex gap-2">
+                <button id="btn-map-locate-me" class="btn btn-primary btn-sm">
+                  <i class="fas fa-crosshairs"></i> Use My GPS Location
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="MapsModule.resetFilters()">
+                  <i class="fas fa-redo"></i> Reset Filters
+                </button>
+              </div>
+            </div>
+
+            <!-- Maps Filter & Search Toolbar -->
+            <div class="card mb-4" style="padding: 1rem 1.25rem;">
+              <div class="map-filters-grid">
+                <div class="form-group mb-0">
+                  <label class="form-label text-xs" for="map-search-input">Search Workshops</label>
+                  <div class="input-icon-wrapper">
+                    <i class="fas fa-search input-icon text-muted"></i>
+                    <input type="text" id="map-search-input" class="input input-sm" placeholder="Search by name, locality, city...">
+                  </div>
+                </div>
+
+                <div class="form-group mb-0">
+                  <label class="form-label text-xs" for="map-filter-city">Select City / Region</label>
+                  <select id="map-filter-city" class="select select-sm">
+                    <option value="ALL">All Regions &amp; Cities</option>
+                  </select>
+                </div>
+
+                <div class="form-group mb-0">
+                  <label class="form-label text-xs" for="map-filter-radius">Distance Proximity</label>
+                  <select id="map-filter-radius" class="select select-sm">
+                    <option value="ALL">Any Distance</option>
+                    <option value="5">Within 5 km</option>
+                    <option value="15">Within 15 km</option>
+                    <option value="30">Within 30 km</option>
+                    <option value="50">Within 50 km</option>
+                  </select>
+                </div>
+
+                <div class="form-group mb-0">
+                  <label class="form-label text-xs" for="map-filter-fuel">Fuel / Powertrain Type</label>
+                  <select id="map-filter-fuel" class="select select-sm">
+                    <option value="ALL">All Powertrains</option>
+                    <option value="Electric">Electric Vehicle (EV)</option>
+                    <option value="Petrol">Petrol</option>
+                    <option value="Diesel">Diesel</option>
+                    <option value="Hybrid">Hybrid</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- GPS Status Line -->
+              <div class="flex justify-between items-center mt-3 pt-2 border-top-subtle">
+                <div id="map-user-loc-text" class="text-xs text-muted">
+                  <i class="fas fa-map-marker-alt text-brand"></i> Centered on Hyderabad (Default). Click "Use My GPS Location" for live distance.
+                </div>
+                <div class="text-xs text-muted">
+                  <span class="badge badge-success text-xs"><i class="fas fa-check-circle"></i> Google Maps Key Active</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2-Column Responsive Layout: Map & Centers List -->
+            <div class="map-layout-grid">
+              <!-- Left Map Canvas -->
+              <div class="card map-canvas-card">
+                <div class="flex justify-between items-center mb-3">
+                  <h3 class="card-title mb-0"><i class="fas fa-map-marked-alt text-brand"></i> Workshop Map View</h3>
+                  <div class="flex gap-2">
+                    <span class="badge badge-primary text-xs">Live Pins</span>
+                  </div>
+                </div>
+                <div id="service-centers-map" class="map-view-canvas">
+                  <!-- Dynamically rendered by MapsModule (Google Maps or Interactive Visual Canvas) -->
+                </div>
+              </div>
+
+              <!-- Right Centers Cards List -->
+              <div class="card map-list-card">
+                <div class="flex justify-between items-center mb-3">
+                  <h3 class="card-title mb-0"><i class="fas fa-warehouse text-brand"></i> Authorized Centers</h3>
+                  <span id="centers-found-count" class="badge badge-secondary text-xs">Loading...</span>
+                </div>
+                <div id="service-centers-list" class="centers-cards-list">
+                  <!-- Dynamically rendered centers list -->
+                </div>
+              </div>
             </div>
           </section>
 
@@ -1517,6 +1642,7 @@
   <script src="js/modules/appointments.js"></script>
   <script src="js/modules/dashboard.js"></script>
   <script src="js/modules/customer.js"></script>
+  <script src="js/modules/maps.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
