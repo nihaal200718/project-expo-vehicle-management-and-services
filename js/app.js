@@ -63,28 +63,8 @@ const App = (() => {
     const headerTitle = document.getElementById('portal-header-title');
     const headerSub = document.getElementById('portal-header-sub');
     const personaWidget = document.getElementById('customer-persona-widget');
-    const portalBadgeEl = document.getElementById('active-portal-badge');
 
-    // Update the portal indicator display in header
-    if (portalBadgeEl) {
-      if (mode === 'admin') {
-        portalBadgeEl.innerHTML = `
-          <span class="portal-badge-chip badge-admin">
-            <i class="fas fa-tools"></i>
-            <span>Service Center Portal</span>
-            <span class="role-tag">Admin</span>
-          </span>
-        `;
-      } else {
-        portalBadgeEl.innerHTML = `
-          <span class="portal-badge-chip badge-customer">
-            <i class="fas fa-user-circle"></i>
-            <span>Customer Portal</span>
-            <span class="role-tag">Customer</span>
-          </span>
-        `;
-      }
-    }
+    if (headerTitle) headerTitle.textContent = 'Vehicle Management & Services';
 
     if (mode === 'customer') {
       adminSidebar?.classList.add('hidden');
@@ -95,8 +75,7 @@ const App = (() => {
 
       personaWidget?.classList.remove('hidden');
 
-      if (headerTitle) headerTitle.textContent = 'Customer Vehicle & Service Portal';
-      if (headerSub) headerSub.textContent = 'Manage your personal garage, live booking progress, nearest service centers & roadside help';
+      if (headerSub) headerSub.textContent = 'Manage your garage, live service progress, nearest workshops & roadside help';
 
       CustomerModule.renderCustomerPortal();
     } else {
@@ -108,7 +87,6 @@ const App = (() => {
 
       personaWidget?.classList.add('hidden');
 
-      if (headerTitle) headerTitle.textContent = 'Service Center & Workshop Portal';
       if (headerSub) headerSub.textContent = 'Operations command center: fleet inventory, owner registry, job cards, schedule & reports';
 
       navigateTo(activeAdminTab);

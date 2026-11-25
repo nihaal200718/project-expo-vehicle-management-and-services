@@ -256,37 +256,13 @@ const Auth = (() => {
     const userNameEl = document.getElementById('user-header-name');
     const userEmailEl = document.getElementById('user-header-email');
     const userBadgeEl = document.getElementById('user-provider-badge');
-    const portalBadgeEl = document.getElementById('active-portal-badge');
-
-    const role = Store.getPortalRole() || (user ? user.role : 'customer') || 'customer';
-
-    // Update active portal indicator in header
-    if (portalBadgeEl) {
-      if (role === 'admin') {
-        portalBadgeEl.innerHTML = `
-          <span class="portal-badge-chip badge-admin">
-            <i class="fas fa-tools"></i>
-            <span>Service Center Portal</span>
-            <span class="role-tag">Admin</span>
-          </span>
-        `;
-      } else {
-        portalBadgeEl.innerHTML = `
-          <span class="portal-badge-chip badge-customer">
-            <i class="fas fa-user-circle"></i>
-            <span>Customer Portal</span>
-            <span class="role-tag">Customer</span>
-          </span>
-        `;
-      }
-    }
 
     if (user) {
       if (userNameEl) userNameEl.textContent = user.name;
       if (userEmailEl) userEmailEl.textContent = user.email;
       if (userAvatarEl) userAvatarEl.src = user.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.name)}`;
       if (userBadgeEl) {
-        userBadgeEl.textContent = user.role === 'admin' ? 'Admin Officer' : (user.provider === 'google' ? 'Google Customer' : 'Customer Account');
+        userBadgeEl.textContent = user.role === 'admin' ? 'Admin Officer' : (user.provider === 'google' ? 'Google Account' : 'Verified Account');
         userBadgeEl.className = `badge ${user.role === 'admin' ? 'badge-danger' : (user.provider === 'google' ? 'badge-google' : 'badge-primary')}`;
       }
       hideAuthOverlay();
