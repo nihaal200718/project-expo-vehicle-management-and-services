@@ -58,7 +58,7 @@ const SERVICE_TYPES = [
 // ----- Google Maps settings -----
 // 1. Create a key in Google Cloud Console and enable "Maps JavaScript API" + "Places API (New)".
 // 2. Paste it below. (Restrict the key to your site/localhost under "Application restrictions".)
-const GOOGLE_MAPS_API_KEY = "AIzaSyC0M32YD1YA8JYsuZzF470J_iMQJ5F8W-c";
+const GOOGLE_MAPS_API_KEY = "AIzaSyBOjTXsp4UggV7XVOEkp38AdHzECzJz4qc";
 const SEARCH_RADII_METERS = [5000, 15000, 40000]; // widen the search if nothing is found
 // Keep the map focused on the closest vehicle service shops, not every result nearby.
 const MAX_CENTERS = 5;
