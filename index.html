@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="color-scheme: dark; background-color: #080c16;">
 <head>
   <meta charset="UTF-8">
+  <meta name="color-scheme" content="dark">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AutoCare - Vehicle Management & Service System</title>
   <!-- FontAwesome Icons -->
@@ -170,8 +171,12 @@
           <section id="cust-view-dashboard" class="customer-subview">
             <div class="section-header-bar">
               <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="badge badge-primary font-mono text-xs"><i class="fas fa-satellite-dish"></i> TELEMETRY ONLINE</span>
+                  <span class="badge badge-success font-mono text-xs"><i class="fas fa-shield-alt"></i> SYSTEMS SECURE</span>
+                </div>
                 <h1>Welcome, <span id="cust-welcome-name">Valued Customer</span> </h1>
-                <p>Welcome to your personal vehicle maintenance dashboard. Monitor your fleet health, upcoming bookings, and service documents.</p>
+                <p>Real-time vehicle telemetry, maintenance diagnostics, scheduled bookings, and encrypted document wallet.</p>
               </div>
               <div class="flex gap-2">
                 <button class="btn btn-outline btn-sm" onclick="CustomerModule.showCustomerView('centers')">
@@ -532,7 +537,7 @@
                 <div class="form-grid-2">
                   <div class="form-group">
                     <label class="form-label" for="cust-prof-id">Customer / Owner ID</label>
-                    <input type="text" id="cust-prof-id" class="input font-mono" readonly style="background:#f1f5f9;">
+                    <input type="text" id="cust-prof-id" class="input font-mono" readonly style="background: rgba(255,255,255,0.05); color: #94a3b8; border-color: rgba(255,255,255,0.1);">
                   </div>
                   <div class="form-group">
                     <label class="form-label required" for="cust-prof-name">Full Name</label>
@@ -944,7 +949,7 @@
                   </div>
                   <div class="form-group">
                     <label class="form-label">Linked Owner (Auto-filled)</label>
-                    <input type="text" id="srv-owner-display" class="input" readonly placeholder="Select a vehicle first" style="background:#f1f5f9;">
+                    <input type="text" id="srv-owner-display" class="input" readonly placeholder="Select a vehicle first" style="background: rgba(255,255,255,0.05); color: #94a3b8; border-color: rgba(255,255,255,0.1);">
                   </div>
                   <div class="form-group">
                     <label class="form-label required" for="srv-date-input">Service Date</label>
@@ -1088,7 +1093,7 @@
                   </div>
                   <div class="form-group">
                     <label class="form-label">Vehicle Owner (Auto-filled)</label>
-                    <input type="text" id="apt-owner-display" class="input" readonly placeholder="Auto-populated" style="background:#f1f5f9;">
+                    <input type="text" id="apt-owner-display" class="input" readonly placeholder="Auto-populated" style="background: rgba(255,255,255,0.05); color: #94a3b8; border-color: rgba(255,255,255,0.1);">
                   </div>
                   <div class="form-group">
                     <div class="flex justify-between items-center mb-1">
@@ -1268,7 +1273,7 @@
         <p class="text-xs text-muted mb-4">Please sign in using your email account or Google Profile</p>
 
         <!-- Google Sign-in Button -->
-        <button type="button" class="btn btn-outline full-width btn-google-login mb-4" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.75rem; border-color: #cbd5e1;">
+        <button type="button" class="btn btn-outline full-width btn-google-login mb-4" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.75rem; border-color: rgba(255,255,255,0.15);">
           <svg class="google-logo-svg" style="width: 18px; height: 18px; margin: 0;" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -1388,7 +1393,7 @@
         <form id="form-owner-edit">
           <div class="form-group">
             <label class="form-label" for="edit-owner-id">Owner ID (Immutable)</label>
-            <input type="text" id="edit-owner-id" class="input font-mono" readonly style="background:#f1f5f9;">
+            <input type="text" id="edit-owner-id" class="input font-mono" readonly style="background: rgba(255,255,255,0.05); color: #94a3b8; border-color: rgba(255,255,255,0.1);">
           </div>
           <div class="form-group">
             <label class="form-label required" for="edit-owner-name">Full Name</label>
