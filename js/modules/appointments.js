@@ -18,11 +18,63 @@ const AppointmentModule = (() => {
   let rescheduleTargetId = null;
   let rescheduleSelectedSlot = null;
 
+  const ADMIN_SERVICE_OPTIONS = [
+    { name: 'Comprehensive Periodic Service', price: 5499, icon: 'fas fa-tools' },
+    { name: 'General Health Inspection', price: 1499, icon: 'fas fa-stethoscope' },
+    { name: 'Tire Rotation & Balance', price: 1200, icon: 'fas fa-circle-notch' },
+    { name: 'Brake Pad Check & Flush', price: 3800, icon: 'fas fa-compact-disc' },
+    { name: 'AC Filter & Gas Top-up', price: 2200, icon: 'fas fa-snowflake' },
+    { name: 'Battery Health & Electrical Check', price: 1500, icon: 'fas fa-bolt' },
+    { name: 'Car Detailing & Foam Wash', price: 1800, icon: 'fas fa-soap' }
+  ];
+
+  let selectedAdminServices = ['Comprehensive Periodic Service'];
+
   const init = () => {
     bindEvents();
     renderTimeSlots();
+    renderAdminServiceCheckboxes();
     renderAppointmentsList();
     setDefaultDate();
+  };
+
+  const renderAdminServiceCheckboxes = () => {
+    const container = document.getElementById('apt-services-checkboxes-grid');
+    if (!container) return;
+
+    container.innerHTML = ADMIN_SERVICE_OPTIONS.map((srv) => {
+      const isChecked = selectedAdminServices.includes(srv.name);
+      return `
+        <label class="apt-service-pill ${isChecked ? 'active' : ''}">
+          <input type="checkbox" value="${escapeHtml(srv.name)}" ${isChecked ? 'checked' : ''} onchange="AppointmentModule.toggleAdminService('${escapeHtml(srv.name)}')">
+          <span class="pill-check-icon"><i class="fas ${isChecked ? 'fa-check-square text-brand' : 'fa-square text-muted'}"></i></span>
+          <span class="pill-title"><i class="${srv.icon} text-muted mr-1"></i> ${escapeHtml(srv.name)}</span>
+          <span class="pill-price font-mono">₹${srv.price.toLocaleString('en-IN')}</span>
+        </label>
+      `;
+    }).join('');
+
+    const hiddenInput = document.getElementById('apt-service-type');
+    if (hiddenInput) {
+      hiddenInput.value = selectedAdminServices.join(', ');
+    }
+  };
+
+  const toggleAdminService = (serviceName) => {
+    const idx = selectedAdminServices.indexOf(serviceName);
+    if (idx > -1) {
+      if (selectedAdminServices.length === 1) {
+        if (typeof App !== 'undefined' && App.showToast) {
+          App.showToast('Please keep at least one service selected.', 'info');
+        }
+        renderAdminServiceCheckboxes();
+        return;
+      }
+      selectedAdminServices.splice(idx, 1);
+    } else {
+      selectedAdminServices.push(serviceName);
+    }
+    renderAdminServiceCheckboxes();
   };
 
   const setDefaultDate = () => {
@@ -121,7 +173,16 @@ const AppointmentModule = (() => {
       return;
     }
 
-    const serviceType = document.getElementById('apt-service-type').value;
+    if (!selectedAdminServices || selectedAdminServices.length === 0) {
+      const fallback = document.getElementById('apt-service-type')?.value;
+      if (fallback) {
+        selectedAdminServices = [fallback];
+      } else {
+        alert('Please select at least one service for the appointment.');
+        return;
+      }
+    }
+
     const date = document.getElementById('apt-date-input').value;
     const notes = document.getElementById('apt-notes-input').value.trim();
 
@@ -136,10 +197,17 @@ const AppointmentModule = (() => {
     }
 
     try {
+      const totalEstimatedCost = selectedAdminServices.reduce((sum, name) => {
+        const s = ADMIN_SERVICE_OPTIONS.find((x) => x.name === name);
+        return sum + (s ? s.price : 0);
+      }, 0);
+
       const newApt = Store.addAppointment({
         vehicleId: veh.id,
         ownerId: veh.ownerId,
-        serviceType,
+        serviceType: selectedAdminServices.join(', '),
+        serviceTypes: [...selectedAdminServices],
+        totalEstimatedCost,
         date,
         timeSlot: selectedTimeSlot,
         notes
@@ -150,6 +218,8 @@ const AppointmentModule = (() => {
 
       // Reset Form
       document.getElementById('form-appointment-book').reset();
+      selectedAdminServices = ['Comprehensive Periodic Service'];
+      renderAdminServiceCheckboxes();
       selectedTimeSlot = null;
       renderTimeSlots();
       setDefaultDate();
@@ -166,6 +236,10 @@ const AppointmentModule = (() => {
     const modal = document.getElementById('modal-booking-confirmation');
     const content = document.getElementById('booking-confirmation-content');
     if (!modal || !content) return;
+
+    const sTypes = apt.serviceTypes && apt.serviceTypes.length
+      ? apt.serviceTypes
+      : (apt.serviceType ? apt.serviceType.split(', ').map((s) => s.trim()) : ['General Service']);
 
     content.innerHTML = `
       <div class="confirmation-badge-success">
@@ -184,9 +258,16 @@ const AppointmentModule = (() => {
           <span class="badge badge-success"><i class="fas fa-check-circle"></i> ${apt.status}</span>
         </div>
         <div class="summary-line">
-          <span>Service Required:</span>
-          <span class="font-semibold">${escapeHtml(apt.serviceType)}</span>
+          <span>Services Booked:</span>
+          <div class="flex flex-wrap gap-1" style="max-width: 65%; justify-content: flex-end;">
+            ${sTypes.map((s) => `<span class="badge badge-primary"><i class="fas fa-check"></i> ${escapeHtml(s)}</span>`).join(' ')}
+          </div>
         </div>
+        ${apt.totalEstimatedCost ? `
+        <div class="summary-line">
+          <span>Estimated Total:</span>
+          <span class="font-mono font-bold text-brand">₹${Number(apt.totalEstimatedCost).toLocaleString('en-IN')}</span>
+        </div>` : ''}
         <div class="summary-line">
           <span>Scheduled Date:</span>
           <span class="font-semibold">${apt.date}</span>
@@ -262,7 +343,12 @@ const AppointmentModule = (() => {
           </div>
 
           <div class="apt-card-body">
-            <h4 class="apt-service-title">${escapeHtml(apt.serviceType)}</h4>
+            <div class="flex flex-wrap gap-1 mb-2">
+              ${(apt.serviceTypes && apt.serviceTypes.length ? apt.serviceTypes : (apt.serviceType ? apt.serviceType.split(', ').map((s) => s.trim()) : ['General Service'])).map((s) => `
+                <span class="badge badge-primary text-xs"><i class="fas fa-tools"></i> ${escapeHtml(s)}</span>
+              `).join('')}
+            </div>
+            ${apt.totalEstimatedCost ? `<div class="text-xs text-muted font-mono mb-2"><i class="fas fa-tag text-brand"></i> Total Estimate: <strong>₹${Number(apt.totalEstimatedCost).toLocaleString('en-IN')}</strong></div>` : ''}
             <div class="apt-slot-badge"><i class="far fa-clock"></i> ${escapeHtml(apt.timeSlot)}</div>
 
             <div class="apt-meta-info mt-3">
@@ -463,6 +549,8 @@ const AppointmentModule = (() => {
   return {
     init,
     renderAppointmentsList,
+    renderAdminServiceCheckboxes,
+    toggleAdminService,
     viewDetail,
     openRescheduleModal,
     openCancelModal,

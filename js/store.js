@@ -598,13 +598,26 @@ const Store = (() => {
     const id = generateId('APT');
     const owner = getOwnerById(aptData.ownerId);
 
+    const serviceTypes = Array.isArray(aptData.serviceTypes) && aptData.serviceTypes.length > 0
+      ? aptData.serviceTypes
+      : (aptData.serviceType ? (Array.isArray(aptData.serviceType) ? aptData.serviceType : aptData.serviceType.split(', ').map((s) => s.trim())) : ['Comprehensive Periodic Service']);
+
+    const serviceType = Array.isArray(aptData.serviceType)
+      ? aptData.serviceType.join(', ')
+      : (aptData.serviceType || serviceTypes.join(', '));
+
+    const totalEstimatedCost = Number(aptData.totalEstimatedCost) || 0;
+
     const newApt = {
       id,
       appointmentId: id,
       vehicleId: aptData.vehicleId,
       ownerId: aptData.ownerId,
       ownerName: owner ? owner.name : '',
-      serviceType: aptData.serviceType,
+      serviceType,
+      serviceTypes,
+      totalEstimatedCost,
+      serviceCenter: aptData.serviceCenter || 'AutoCare Tech City Supercenter',
       date: aptData.date || aptData.appointmentDate,
       appointmentDate: aptData.date || aptData.appointmentDate,
       timeSlot: aptData.timeSlot,

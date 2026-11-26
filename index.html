@@ -305,11 +305,12 @@
             </div>
 
             <div class="card mb-4">
-              <h3 class="card-title"><i class="fas fa-box-open text-brand"></i> Step 1: Select Service Package</h3>
-              <p class="text-xs text-muted mb-3">Pick an all-inclusive package with upfront pricing (no hidden charges):</p>
+              <h3 class="card-title"><i class="fas fa-boxes-stacked text-brand"></i> Step 1: Select Service Packages</h3>
+              <p class="text-xs text-muted mb-3">Choose one or more packages with upfront transparent pricing (select all that apply):</p>
               <div id="cust-packages-grid" class="packages-grid">
                 <!-- Dynamically populated package cards -->
               </div>
+              <div id="cust-packages-summary-container"></div>
 
               <hr class="my-4 border-subtle">
 
@@ -1095,16 +1096,12 @@
                     <input type="text" id="apt-owner-display" class="input" readonly placeholder="Auto-populated" style="background:#f1f5f9;">
                   </div>
                   <div class="form-group">
-                    <label class="form-label required" for="apt-service-type">Service Required</label>
-                    <select id="apt-service-type" class="select" required>
-                      <option value="Comprehensive Periodic Service">Comprehensive Periodic Service</option>
-                      <option value="General Health Inspection">General Health Inspection</option>
-                      <option value="Tire Rotation & Balance">Tire Rotation & Balance</option>
-                      <option value="Brake Pad Check & Flush">Brake Pad Check & Flush</option>
-                      <option value="AC Filter & Gas Top-up">AC Filter & Gas Top-up</option>
-                      <option value="Battery Health & Electrical Check">Battery Health & Electrical Check</option>
-                      <option value="Car Detailing & Foam Wash">Car Detailing & Foam Wash</option>
-                    </select>
+                    <div class="flex justify-between items-center mb-1">
+                      <label class="form-label required">Services Required (Multi-Select)</label>
+                      <span class="text-xs text-muted">Select all applicable</span>
+                    </div>
+                    <div id="apt-services-checkboxes-grid" class="apt-services-grid mb-2"></div>
+                    <input type="hidden" id="apt-service-type" value="Comprehensive Periodic Service">
                   </div>
                   <div class="form-group">
                     <label class="form-label required" for="apt-date-input">Appointment Date</label>

@@ -6,7 +6,7 @@
 
 const CustomerModule = (() => {
   let activeCustomerOwnerId = null;
-  let selectedPackage = 'Comprehensive Periodic Service';
+  let selectedPackages = ['Comprehensive Periodic Service'];
   let selectedSlot = '10:00 AM';
 
   const SERVICE_PACKAGES = [
@@ -389,28 +389,84 @@ const CustomerModule = (() => {
     if (!container) return;
 
     container.innerHTML = SERVICE_PACKAGES.map((pkg) => {
-      const isSel = selectedPackage === pkg.name;
+      const isSel = selectedPackages.includes(pkg.name);
       return `
-        <div class="package-option-card ${isSel ? 'selected' : ''}" data-pkg="${pkg.name}" onclick="CustomerModule.selectPackage('${pkg.name}')">
+        <div class="package-option-card ${isSel ? 'selected' : ''}" data-pkg="${escapeHtml(pkg.name)}" onclick="CustomerModule.togglePackage('${escapeHtml(pkg.name)}')">
           <div class="pkg-header flex justify-between items-center">
             <div class="pkg-icon-box"><i class="${pkg.icon}"></i></div>
             <div class="pkg-price font-bold font-mono">₹${pkg.price.toLocaleString('en-IN')}</div>
           </div>
           <h4 class="pkg-name mt-2">${escapeHtml(pkg.name)}</h4>
           <p class="pkg-desc text-xs text-muted mt-1">${escapeHtml(pkg.description)}</p>
-          <div class="pkg-select-indicator mt-3">
-            <span class="indicator-radio">${isSel ? '[Selected]' : 'Select Package'}</span>
+          <div class="pkg-select-indicator mt-3 flex justify-between items-center">
+            <span class="indicator-radio ${isSel ? 'text-brand' : 'text-muted'}">
+              <i class="fas ${isSel ? 'fa-check-square text-brand' : 'fa-square'}"></i> ${isSel ? 'Selected' : 'Add to Booking'}
+            </span>
+            ${isSel ? '<span class="badge badge-xs badge-success">Added</span>' : ''}
           </div>
         </div>
       `;
     }).join('');
+
+    renderPackagesSummary();
+  };
+
+  const renderPackagesSummary = () => {
+    const container = document.getElementById('cust-packages-summary-container');
+    if (!container) return;
+
+    const selectedObjs = SERVICE_PACKAGES.filter((p) => selectedPackages.includes(p.name));
+    const totalEst = selectedObjs.reduce((acc, p) => acc + p.price, 0);
+
+    container.innerHTML = `
+      <div class="selected-packages-cart-bar card p-3 mt-3">
+        <div class="flex justify-between items-center flex-wrap gap-2">
+          <div>
+            <div class="font-bold text-sm">
+              <i class="fas fa-layer-group text-brand"></i> Selected Services (<span id="cust-selected-count">${selectedPackages.length}</span>):
+            </div>
+            <div id="cust-selected-chips-container" class="flex flex-wrap gap-1 mt-2">
+              ${selectedObjs.map((pkg) => `
+                <span class="selected-package-chip badge badge-primary">
+                  <i class="${pkg.icon}"></i> ${escapeHtml(pkg.name)}
+                  <button type="button" class="chip-remove-btn" onclick="event.stopPropagation(); CustomerModule.removePackage('${escapeHtml(pkg.name)}')" title="Remove">&times;</button>
+                </span>
+              `).join('')}
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="text-xs text-muted block">Combined Estimate</span>
+            <span id="cust-selected-total-price" class="text-lg font-bold font-mono text-brand">₹${totalEst.toLocaleString('en-IN')}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
+  const togglePackage = (pkgName) => {
+    const idx = selectedPackages.indexOf(pkgName);
+    if (idx > -1) {
+      if (selectedPackages.length === 1) {
+        if (typeof App !== 'undefined' && App.showToast) {
+          App.showToast('Please keep at least one service package selected.', 'info');
+        }
+        return;
+      }
+      selectedPackages.splice(idx, 1);
+    } else {
+      selectedPackages.push(pkgName);
+    }
+    renderPackagesGrid();
+    const pkgInput = document.getElementById('cust-book-service-type');
+    if (pkgInput) pkgInput.value = selectedPackages.join(', ');
+  };
+
+  const removePackage = (pkgName) => {
+    togglePackage(pkgName);
   };
 
   const selectPackage = (pkgName) => {
-    selectedPackage = pkgName;
-    renderPackagesGrid();
-    const pkgInput = document.getElementById('cust-book-service-type');
-    if (pkgInput) pkgInput.value = pkgName;
+    togglePackage(pkgName);
   };
 
   const renderCustomerVehicleDropdowns = (owner) => {
@@ -472,6 +528,10 @@ const CustomerModule = (() => {
       alert('Please pick a convenient time slot.');
       return;
     }
+    if (!selectedPackages || selectedPackages.length === 0) {
+      alert('Please select at least one service package.');
+      return;
+    }
 
     try {
       const combinedNotes = [
@@ -479,10 +539,17 @@ const CustomerModule = (() => {
         notes ? `[Customer Request] ${notes}` : 'Booked via Customer Portal'
       ].filter(Boolean).join(' | ');
 
+      const totalEstimatedCost = selectedPackages.reduce((acc, name) => {
+        const p = SERVICE_PACKAGES.find((x) => x.name === name);
+        return acc + (p ? p.price : 0);
+      }, 0);
+
       const newApt = Store.addAppointment({
         vehicleId: vehId,
         ownerId: owner.id,
-        serviceType: selectedPackage,
+        serviceType: selectedPackages.join(', '),
+        serviceTypes: [...selectedPackages],
+        totalEstimatedCost,
         serviceCenter: centerVal || 'AutoCare Tech City Supercenter',
         date,
         timeSlot: selectedSlot,
@@ -494,6 +561,7 @@ const CustomerModule = (() => {
 
       // Reset Form
       document.getElementById('form-customer-book-service').reset();
+      selectedPackages = ['Comprehensive Periodic Service'];
       showCustomerView('bookings');
       renderCustomerPortal();
     } catch (err) {
@@ -541,7 +609,12 @@ const CustomerModule = (() => {
           </div>
 
           <div class="booking-vehicle-headline">
-            <h3 class="font-bold">${escapeHtml(apt.serviceType)}</h3>
+            <div class="flex flex-wrap gap-1 mb-2">
+              ${(apt.serviceTypes && apt.serviceTypes.length ? apt.serviceTypes : (apt.serviceType ? apt.serviceType.split(', ').map((s) => s.trim()) : ['General Service'])).map((s) => `
+                <span class="badge badge-primary"><i class="fas fa-tools"></i> ${escapeHtml(s)}</span>
+              `).join('')}
+            </div>
+            ${apt.totalEstimatedCost ? `<div class="text-xs text-muted mb-2 font-mono"><i class="fas fa-tag text-brand"></i> Estimated Total: <strong>₹${Number(apt.totalEstimatedCost).toLocaleString('en-IN')}</strong></div>` : ''}
             <p class="text-xs text-muted">
               Vehicle: <strong>${veh ? `${veh.manufacturer || veh.make} ${veh.model} (${veh.regNumber || veh.registrationNumber})` : 'Vehicle Deleted'}</strong>
             </p>
@@ -825,6 +898,8 @@ const CustomerModule = (() => {
     showCustomerView,
     renderCustomerPortal,
     selectPackage,
+    togglePackage,
+    removePackage,
     selectSlot,
     openAddVehicleModal,
     closeModals,

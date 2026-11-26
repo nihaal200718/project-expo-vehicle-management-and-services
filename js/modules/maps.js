@@ -530,7 +530,7 @@ const MapsModule = (() => {
       <div style="padding: 6px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 260px;">
         <h4 style="margin: 0 0 4px; font-size: 0.95rem; font-weight: 700; color: #0f172a;">${escapeHtml(center.name)}</h4>
         <div style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; margin-bottom: 6px;">
-          <span style="color: #f59e0b; font-weight: 700;">★ ${center.rating}</span>
+          <span style="color: #f59e0b; font-weight: 700;"><i class="fas fa-star" style="color:#f59e0b; margin-right: 2px;"></i>${center.rating}</span>
           <span style="color: #64748b;">(${center.reviewsCount} reviews)</span>
           <span style="background: #e0f2fe; color: #0284c7; padding: 1px 6px; border-radius: 4px; font-weight: 600;">${center.distanceKm} km away</span>
         </div>
@@ -594,7 +594,7 @@ const MapsModule = (() => {
               </div>
               <div class="pin-tooltip">
                 <strong>${escapeHtml(c.name)}</strong>
-                <span>${c.distanceKm} km away • ★ ${c.rating}</span>
+                <span>${c.distanceKm} km away • <i class="fas fa-star" style="color:#f59e0b;"></i> ${c.rating}</span>
               </div>
             </div>
           `;
