@@ -19,13 +19,13 @@ const AppointmentModule = (() => {
   let rescheduleSelectedSlot = null;
 
   const ADMIN_SERVICE_OPTIONS = [
-    { name: 'Comprehensive Periodic Service', price: 5499, icon: 'fas fa-tools' },
-    { name: 'General Health Inspection', price: 1499, icon: 'fas fa-stethoscope' },
-    { name: 'Tire Rotation & Balance', price: 1200, icon: 'fas fa-circle-notch' },
-    { name: 'Brake Pad Check & Flush', price: 3800, icon: 'fas fa-compact-disc' },
-    { name: 'AC Filter & Gas Top-up', price: 2200, icon: 'fas fa-snowflake' },
-    { name: 'Battery Health & Electrical Check', price: 1500, icon: 'fas fa-bolt' },
-    { name: 'Car Detailing & Foam Wash', price: 1800, icon: 'fas fa-soap' }
+    { name: 'Comprehensive Periodic Service', price: 5499 },
+    { name: 'General Health Inspection', price: 1499 },
+    { name: 'Tire Rotation & Balance', price: 1200 },
+    { name: 'Brake Pad Check & Flush', price: 3800 },
+    { name: 'AC Filter & Gas Top-up', price: 2200 },
+    { name: 'Battery Health & Electrical Check', price: 1500 },
+    { name: 'Car Detailing & Foam Wash', price: 1800 }
   ];
 
   let selectedAdminServices = ['Comprehensive Periodic Service'];
@@ -48,7 +48,7 @@ const AppointmentModule = (() => {
         <label class="apt-service-pill ${isChecked ? 'active' : ''}">
           <input type="checkbox" value="${escapeHtml(srv.name)}" ${isChecked ? 'checked' : ''} onchange="AppointmentModule.toggleAdminService('${escapeHtml(srv.name)}')">
           <span class="pill-check-icon"><i class="fas ${isChecked ? 'fa-check-square text-brand' : 'fa-square text-muted'}"></i></span>
-          <span class="pill-title"><i class="${srv.icon} text-muted mr-1"></i> ${escapeHtml(srv.name)}</span>
+          <span class="pill-title">${escapeHtml(srv.name)}</span>
           <span class="pill-price font-mono">₹${srv.price.toLocaleString('en-IN')}</span>
         </label>
       `;
@@ -260,7 +260,7 @@ const AppointmentModule = (() => {
         <div class="summary-line">
           <span>Services Booked:</span>
           <div class="flex flex-wrap gap-1" style="max-width: 65%; justify-content: flex-end;">
-            ${sTypes.map((s) => `<span class="badge badge-primary"><i class="fas fa-check"></i> ${escapeHtml(s)}</span>`).join(' ')}
+            ${sTypes.map((s) => `<span class="badge badge-primary">${escapeHtml(s)}</span>`).join(' ')}
           </div>
         </div>
         ${apt.totalEstimatedCost ? `
@@ -345,7 +345,7 @@ const AppointmentModule = (() => {
           <div class="apt-card-body">
             <div class="flex flex-wrap gap-1 mb-2">
               ${(apt.serviceTypes && apt.serviceTypes.length ? apt.serviceTypes : (apt.serviceType ? apt.serviceType.split(', ').map((s) => s.trim()) : ['General Service'])).map((s) => `
-                <span class="badge badge-primary text-xs"><i class="fas fa-tools"></i> ${escapeHtml(s)}</span>
+                <span class="badge badge-primary text-xs">${escapeHtml(s)}</span>
               `).join('')}
             </div>
             ${apt.totalEstimatedCost ? `<div class="text-xs text-muted font-mono mb-2"><i class="fas fa-tag text-brand"></i> Total Estimate: <strong>₹${Number(apt.totalEstimatedCost).toLocaleString('en-IN')}</strong></div>` : ''}

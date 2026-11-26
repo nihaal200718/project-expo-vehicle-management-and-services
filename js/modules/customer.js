@@ -393,7 +393,7 @@ const CustomerModule = (() => {
       return `
         <div class="package-option-card ${isSel ? 'selected' : ''}" data-pkg="${escapeHtml(pkg.name)}" onclick="CustomerModule.togglePackage('${escapeHtml(pkg.name)}')">
           <div class="pkg-header flex justify-between items-center">
-            <div class="pkg-icon-box"><i class="${pkg.icon}"></i></div>
+            <span class="badge badge-subtle font-mono text-xs">Package</span>
             <div class="pkg-price font-bold font-mono">₹${pkg.price.toLocaleString('en-IN')}</div>
           </div>
           <h4 class="pkg-name mt-2">${escapeHtml(pkg.name)}</h4>
@@ -428,7 +428,7 @@ const CustomerModule = (() => {
             <div id="cust-selected-chips-container" class="flex flex-wrap gap-1 mt-2">
               ${selectedObjs.map((pkg) => `
                 <span class="selected-package-chip badge badge-primary">
-                  <i class="${pkg.icon}"></i> ${escapeHtml(pkg.name)}
+                  ${escapeHtml(pkg.name)}
                   <button type="button" class="chip-remove-btn" onclick="event.stopPropagation(); CustomerModule.removePackage('${escapeHtml(pkg.name)}')" title="Remove">&times;</button>
                 </span>
               `).join('')}
@@ -611,7 +611,7 @@ const CustomerModule = (() => {
           <div class="booking-vehicle-headline">
             <div class="flex flex-wrap gap-1 mb-2">
               ${(apt.serviceTypes && apt.serviceTypes.length ? apt.serviceTypes : (apt.serviceType ? apt.serviceType.split(', ').map((s) => s.trim()) : ['General Service'])).map((s) => `
-                <span class="badge badge-primary"><i class="fas fa-tools"></i> ${escapeHtml(s)}</span>
+                <span class="badge badge-primary">${escapeHtml(s)}</span>
               `).join('')}
             </div>
             ${apt.totalEstimatedCost ? `<div class="text-xs text-muted mb-2 font-mono"><i class="fas fa-tag text-brand"></i> Estimated Total: <strong>₹${Number(apt.totalEstimatedCost).toLocaleString('en-IN')}</strong></div>` : ''}
