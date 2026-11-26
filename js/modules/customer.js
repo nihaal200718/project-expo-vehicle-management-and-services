@@ -770,6 +770,10 @@ const CustomerModule = (() => {
       modal.classList.remove('hidden');
       modal.classList.add('flex');
     }
+    const regInput = document.getElementById('cust-veh-reg');
+    if (regInput && typeof VehicleModule !== 'undefined' && VehicleModule.attachPlateInputRestrictions) {
+      VehicleModule.attachPlateInputRestrictions(regInput);
+    }
   };
 
   const closeModals = () => {
@@ -794,6 +798,11 @@ const CustomerModule = (() => {
       pucExpiry: document.getElementById('cust-veh-puc').value,
       ownerId: owner.id
     };
+
+    if (!Store.isValidPlateNumber(data.regNumber)) {
+      alert('Invalid registration number plate format. Standard format required (e.g. KA 05 MC 1234, DL 03 CB 4120, or MH 02 CL 4589).');
+      return;
+    }
 
     try {
       const newVeh = Store.addVehicle(data);

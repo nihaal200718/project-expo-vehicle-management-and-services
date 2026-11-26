@@ -862,8 +862,9 @@
                     <select id="veh-owner-input" class="select owner-select-dropdown" required></select>
                   </div>
                   <div class="form-group">
-                    <label class="form-label required" for="veh-reg-input">Registration Number</label>
-                    <input type="text" id="veh-reg-input" class="input font-mono" placeholder="e.g. MH 02 CL 4589" required>
+                    <label class="form-label required" for="veh-reg-input">Registration Number Plate</label>
+                    <input type="text" id="veh-reg-input" class="input font-mono" placeholder="e.g. MH 02 CL 4589" maxlength="14" style="text-transform: uppercase;" pattern="^[A-Za-z]{2}[ -]?[0-9]{1,2}[ -]?[A-Za-z]{0,3}[ -]?[0-9]{4}|[0-9]{2}[ -]?[Bb][Hh][ -]?[0-9]{4}[ -]?[A-Za-z]{1,2}$" title="Format: e.g. MH 02 CL 4589 or KA 05 MC 1234" required>
+                    <span class="text-xs text-muted block mt-1"><i class="fas fa-info-circle text-brand"></i> Format: State code, RTO code &amp; 4 digits (e.g. KA 05 MC 1234)</span>
                   </div>
                   <div class="form-grid-2">
                     <div class="form-group">
@@ -1214,7 +1215,8 @@
         <form id="form-customer-add-vehicle">
           <div class="form-group">
             <label class="form-label required" for="cust-veh-reg">Registration Plate Number</label>
-            <input type="text" id="cust-veh-reg" class="input font-mono" placeholder="e.g. KA 05 MC 1234" required>
+            <input type="text" id="cust-veh-reg" class="input font-mono" placeholder="e.g. KA 05 MC 1234" maxlength="14" style="text-transform: uppercase;" pattern="^[A-Za-z]{2}[ -]?[0-9]{1,2}[ -]?[A-Za-z]{0,3}[ -]?[0-9]{4}|[0-9]{2}[ -]?[Bb][Hh][ -]?[0-9]{4}[ -]?[A-Za-z]{1,2}$" title="Format: e.g. KA 05 MC 1234 or DL 03 CB 4120" required>
+            <span class="text-xs text-muted block mt-1"><i class="fas fa-info-circle text-brand"></i> Format: State code, RTO code &amp; 4 digits (e.g. KA 05 MC 1234)</span>
           </div>
           <div class="form-grid-2">
             <div class="form-group">
@@ -1436,8 +1438,9 @@
             <select id="edit-veh-owner" class="select" required></select>
           </div>
           <div class="form-group">
-            <label class="form-label required" for="edit-veh-reg">Registration Number</label>
-            <input type="text" id="edit-veh-reg" class="input font-mono" required>
+            <label class="form-label required" for="edit-veh-reg">Registration Number Plate</label>
+            <input type="text" id="edit-veh-reg" class="input font-mono" maxlength="14" style="text-transform: uppercase;" pattern="^[A-Za-z]{2}[ -]?[0-9]{1,2}[ -]?[A-Za-z]{0,3}[ -]?[0-9]{4}|[0-9]{2}[ -]?[Bb][Hh][ -]?[0-9]{4}[ -]?[A-Za-z]{1,2}$" title="Format: e.g. MH 02 CL 4589 or KA 05 MC 1234" required>
+            <span class="text-xs text-muted block mt-1"><i class="fas fa-info-circle text-brand"></i> Format: State code, RTO code &amp; 4 digits (e.g. KA 05 MC 1234)</span>
           </div>
           <div class="form-grid-2">
             <div class="form-group">

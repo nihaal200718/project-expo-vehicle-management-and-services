@@ -65,6 +65,11 @@ const VehicleModule = (() => {
       });
     }
 
+    // Attach number plate input restrictions
+    attachPlateInputRestrictions(document.getElementById('veh-reg-input'));
+    attachPlateInputRestrictions(document.getElementById('edit-veh-reg'));
+    attachPlateInputRestrictions(document.getElementById('cust-veh-reg'));
+
     // Store listener
     Store.subscribe((key) => {
       if (key === Store.KEYS.VEHICLES || key === Store.KEYS.OWNERS || key === 'reset') {
@@ -74,13 +79,59 @@ const VehicleModule = (() => {
     });
   };
 
+  const attachPlateInputRestrictions = (inputEl) => {
+    if (!inputEl) return;
+    inputEl.setAttribute('maxlength', '14');
+    inputEl.setAttribute('autocomplete', 'off');
+    inputEl.style.textTransform = 'uppercase';
+
+    inputEl.addEventListener('input', (e) => {
+      const start = e.target.selectionStart;
+      const originalVal = e.target.value;
+      // Convert to uppercase and strip any characters not alphanumeric, space, or hyphen
+      const cleanVal = originalVal.toUpperCase().replace(/[^A-Z0-9 -]/g, '').replace(/\s{2,}/g, ' ');
+
+      if (originalVal !== cleanVal) {
+        e.target.value = cleanVal;
+        try { e.target.setSelectionRange(start, start); } catch (_) {}
+      }
+
+      // Live validation visual indicator
+      if (cleanVal.length >= 6) {
+        if (Store.isValidPlateNumber(cleanVal)) {
+          e.target.classList.remove('is-invalid');
+          e.target.classList.add('is-valid');
+        } else {
+          e.target.classList.remove('is-valid');
+          e.target.classList.add('is-invalid');
+        }
+      } else {
+        e.target.classList.remove('is-valid', 'is-invalid');
+      }
+    });
+
+    inputEl.addEventListener('blur', (e) => {
+      e.target.value = e.target.value.trim().toUpperCase();
+      if (e.target.value) {
+        if (!Store.isValidPlateNumber(e.target.value)) {
+          e.target.classList.remove('is-valid');
+          e.target.classList.add('is-invalid');
+        } else {
+          e.target.classList.remove('is-invalid');
+          e.target.classList.add('is-valid');
+        }
+      } else {
+        e.target.classList.remove('is-valid', 'is-invalid');
+      }
+    });
+  };
+
   const validateVehicleData = (data) => {
     const errors = [];
 
-    // Registration number format validation (alphanumeric, spaces/hyphens allowed, length 5-15)
-    const regClean = data.regNumber.replace(/[\s-]/g, '');
-    if (!regClean || regClean.length < 5 || regClean.length > 15) {
-      errors.push('Registration number must be 5 to 15 alphanumeric characters (e.g. DL 03 CB 4120).');
+    // Registration number format restriction
+    if (!data.regNumber || !Store.isValidPlateNumber(data.regNumber)) {
+      errors.push('Registration number must follow standard format (e.g. KA 05 MC 1234, DL 03 CB 4120, or MH 02 CL 4589).');
     }
 
     if (!data.manufacturer || data.manufacturer.trim().length < 2) {
@@ -491,6 +542,7 @@ const VehicleModule = (() => {
     populateVehicleDropdowns,
     checkExpiryStatus,
     getFuelBadgeClass,
-    getFuelIcon
+    getFuelIcon,
+    attachPlateInputRestrictions
   };
 })();

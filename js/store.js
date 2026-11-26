@@ -395,6 +395,13 @@ const Store = (() => {
   };
 
   // --- MEMBER 2: VEHICLE OPERATIONS ---
+  const isValidPlateNumber = (plate) => {
+    if (!plate || typeof plate !== 'string') return false;
+    const clean = plate.trim().toUpperCase();
+    const regex = /^([A-Z]{2}[ -]?[0-9]{1,2}[ -]?[A-Z]{0,3}[ -]?[0-9]{4}|[0-9]{2}[ -]?BH[ -]?[0-9]{4}[ -]?[A-Z]{1,2})$/;
+    return regex.test(clean);
+  };
+
   const getVehicles = () => get(KEYS.VEHICLES, []);
 
   const getVehicleById = (id) => {
@@ -409,6 +416,10 @@ const Store = (() => {
   const addVehicle = (vehicleData) => {
     const list = getVehicles();
     const regUpper = (vehicleData.regNumber || vehicleData.registrationNumber || '').trim().toUpperCase();
+
+    if (!isValidPlateNumber(regUpper)) {
+      throw new Error(`Invalid registration number plate '${regUpper}'. Standard format required (e.g. KA 05 MC 1234, DL 03 CB 4120, or MH 02 CL 4589).`);
+    }
 
     if (list.some((v) => (v.regNumber || v.registrationNumber || '').toUpperCase() === regUpper)) {
       throw new Error(`Vehicle registration '${regUpper}' is already registered in the system.`);
@@ -445,6 +456,9 @@ const Store = (() => {
 
     if (updatedFields.regNumber || updatedFields.registrationNumber) {
       const regUpper = (updatedFields.regNumber || updatedFields.registrationNumber).trim().toUpperCase();
+      if (!isValidPlateNumber(regUpper)) {
+        throw new Error(`Invalid registration number plate '${regUpper}'. Standard format required (e.g. KA 05 MC 1234, DL 03 CB 4120, or MH 02 CL 4589).`);
+      }
       const duplicate = list.find((v) => (v.id !== id && v.vehicleId !== id) && (v.regNumber || v.registrationNumber || '').toUpperCase() === regUpper);
       if (duplicate) throw new Error(`Vehicle registration '${regUpper}' already belongs to vehicle ${duplicate.model}.`);
       updatedFields.regNumber = regUpper;
@@ -882,6 +896,7 @@ const Store = (() => {
     updateOwner,
     deleteOwner,
     // Vehicles (Member 2)
+    isValidPlateNumber,
     getVehicles,
     getVehicleById,
     getVehiclesByOwner,
